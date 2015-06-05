@@ -22,6 +22,7 @@
 		B63612611B1F556800289665 /* PeakFinder.m in Sources */ = {isa = PBXBuildFile; fileRef = B63612601B1F556800289665 /* PeakFinder.m */; };
 		B6A761641B20C97A00EB4121 /* SpirometryWhistle.m in Sources */ = {isa = PBXBuildFile; fileRef = B6A761631B20C97A00EB4121 /* SpirometryWhistle.m */; };
 		B6A761671B21107C00EB4121 /* FlowVolumeDataAnalyzer.m in Sources */ = {isa = PBXBuildFile; fileRef = B6A761661B21107C00EB4121 /* FlowVolumeDataAnalyzer.m */; };
+		B6A7616A1B22378A00EB4121 /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = B6A761691B22378A00EB4121 /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -65,6 +66,7 @@
 		B6A761631B20C97A00EB4121 /* SpirometryWhistle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpirometryWhistle.m; sourceTree = "<group>"; };
 		B6A761651B21107C00EB4121 /* FlowVolumeDataAnalyzer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlowVolumeDataAnalyzer.h; sourceTree = "<group>"; };
 		B6A761661B21107C00EB4121 /* FlowVolumeDataAnalyzer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FlowVolumeDataAnalyzer.m; sourceTree = "<group>"; };
+		B6A761691B22378A00EB4121 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,6 +120,7 @@
 		B636121F1B1CC38500289665 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				B6A761691B22378A00EB4121 /* README.md */,
 				B636122E1B1CC38500289665 /* LaunchScreen.xib */,
 				B636122C1B1CC38500289665 /* Images.xcassets */,
 				B63612231B1CC38500289665 /* AppDelegate.h */,
@@ -291,6 +294,7 @@
 				B636125B1B1DFFB000289665 /* BufferedOverlapQueue.m in Sources */,
 				B63612551B1CEB3C00289665 /* SpirometerEffortAnalyzer.m in Sources */,
 				B63612521B1CC70E00289665 /* FFTHelper.m in Sources */,
+				B6A7616A1B22378A00EB4121 /* README.md in Sources */,
 				B63612281B1CC38500289665 /* SpiroAnalyzeViewController.m in Sources */,
 				B63612251B1CC38500289665 /* AppDelegate.m in Sources */,
 				B6A761641B20C97A00EB4121 /* SpirometryWhistle.m in Sources */,
