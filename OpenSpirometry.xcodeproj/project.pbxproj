@@ -9,11 +9,19 @@
 /* Begin PBXBuildFile section */
 		B63612221B1CC38500289665 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B63612211B1CC38500289665 /* main.m */; };
 		B63612251B1CC38500289665 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B63612241B1CC38500289665 /* AppDelegate.m */; };
-		B63612281B1CC38500289665 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B63612271B1CC38500289665 /* ViewController.m */; };
+		B63612281B1CC38500289665 /* SpiroAnalyzeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B63612271B1CC38500289665 /* SpiroAnalyzeViewController.m */; };
 		B636122B1B1CC38500289665 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B63612291B1CC38500289665 /* Main.storyboard */; };
 		B636122D1B1CC38500289665 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B636122C1B1CC38500289665 /* Images.xcassets */; };
 		B63612301B1CC38500289665 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = B636122E1B1CC38500289665 /* LaunchScreen.xib */; };
 		B636123C1B1CC38500289665 /* OpenSpirometryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B636123B1B1CC38500289665 /* OpenSpirometryTests.m */; };
+		B636124A1B1CC48900289665 /* Novocaine.m in Sources */ = {isa = PBXBuildFile; fileRef = B63612491B1CC48900289665 /* Novocaine.m */; };
+		B63612521B1CC70E00289665 /* FFTHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = B63612511B1CC70E00289665 /* FFTHelper.m */; };
+		B63612551B1CEB3C00289665 /* SpirometerEffortAnalyzer.m in Sources */ = {isa = PBXBuildFile; fileRef = B63612541B1CEB3C00289665 /* SpirometerEffortAnalyzer.m */; };
+		B636125B1B1DFFB000289665 /* BufferedOverlapQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = B636125A1B1DFFB000289665 /* BufferedOverlapQueue.m */; };
+		B636125E1B1E26F500289665 /* DataBufferBlock.m in Sources */ = {isa = PBXBuildFile; fileRef = B636125D1B1E26F500289665 /* DataBufferBlock.m */; };
+		B63612611B1F556800289665 /* PeakFinder.m in Sources */ = {isa = PBXBuildFile; fileRef = B63612601B1F556800289665 /* PeakFinder.m */; };
+		B6A761641B20C97A00EB4121 /* SpirometryWhistle.m in Sources */ = {isa = PBXBuildFile; fileRef = B6A761631B20C97A00EB4121 /* SpirometryWhistle.m */; };
+		B6A761671B21107C00EB4121 /* FlowVolumeDataAnalyzer.m in Sources */ = {isa = PBXBuildFile; fileRef = B6A761661B21107C00EB4121 /* FlowVolumeDataAnalyzer.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -32,14 +40,31 @@
 		B63612211B1CC38500289665 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		B63612231B1CC38500289665 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		B63612241B1CC38500289665 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		B63612261B1CC38500289665 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		B63612271B1CC38500289665 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		B63612261B1CC38500289665 /* SpiroAnalyzeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SpiroAnalyzeViewController.h; sourceTree = "<group>"; };
+		B63612271B1CC38500289665 /* SpiroAnalyzeViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SpiroAnalyzeViewController.m; sourceTree = "<group>"; };
 		B636122A1B1CC38500289665 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		B636122C1B1CC38500289665 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		B636122F1B1CC38500289665 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		B63612351B1CC38500289665 /* OpenSpirometryTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OpenSpirometryTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B636123A1B1CC38500289665 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B636123B1B1CC38500289665 /* OpenSpirometryTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OpenSpirometryTests.m; sourceTree = "<group>"; };
+		B63612481B1CC48900289665 /* Novocaine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Novocaine.h; sourceTree = "<group>"; };
+		B63612491B1CC48900289665 /* Novocaine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Novocaine.m; sourceTree = "<group>"; };
+		B63612501B1CC70E00289665 /* FFTHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FFTHelper.h; sourceTree = "<group>"; };
+		B63612511B1CC70E00289665 /* FFTHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FFTHelper.m; sourceTree = "<group>"; };
+		B63612531B1CEB3C00289665 /* SpirometerEffortAnalyzer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpirometerEffortAnalyzer.h; sourceTree = "<group>"; };
+		B63612541B1CEB3C00289665 /* SpirometerEffortAnalyzer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpirometerEffortAnalyzer.m; sourceTree = "<group>"; };
+		B63612591B1DFFB000289665 /* BufferedOverlapQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BufferedOverlapQueue.h; sourceTree = "<group>"; };
+		B636125A1B1DFFB000289665 /* BufferedOverlapQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BufferedOverlapQueue.m; sourceTree = "<group>"; };
+		B636125C1B1E26F500289665 /* DataBufferBlock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataBufferBlock.h; sourceTree = "<group>"; };
+		B636125D1B1E26F500289665 /* DataBufferBlock.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataBufferBlock.m; sourceTree = "<group>"; };
+		B636125F1B1F556800289665 /* PeakFinder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PeakFinder.h; sourceTree = "<group>"; };
+		B63612601B1F556800289665 /* PeakFinder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PeakFinder.m; sourceTree = "<group>"; };
+		B6A7615B1B2009B700EB4121 /* SpirometerConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SpirometerConstants.h; sourceTree = "<group>"; };
+		B6A761621B20C97A00EB4121 /* SpirometryWhistle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpirometryWhistle.h; sourceTree = "<group>"; };
+		B6A761631B20C97A00EB4121 /* SpirometryWhistle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpirometryWhistle.m; sourceTree = "<group>"; };
+		B6A761651B21107C00EB4121 /* FlowVolumeDataAnalyzer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlowVolumeDataAnalyzer.h; sourceTree = "<group>"; };
+		B6A761661B21107C00EB4121 /* FlowVolumeDataAnalyzer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FlowVolumeDataAnalyzer.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,13 +106,10 @@
 		B636121E1B1CC38500289665 /* OpenSpirometry */ = {
 			isa = PBXGroup;
 			children = (
-				B63612231B1CC38500289665 /* AppDelegate.h */,
-				B63612241B1CC38500289665 /* AppDelegate.m */,
-				B63612261B1CC38500289665 /* ViewController.h */,
-				B63612271B1CC38500289665 /* ViewController.m */,
+				B636124B1B1CC4C800289665 /* SpiroAnalysisModel */,
+				B63612261B1CC38500289665 /* SpiroAnalyzeViewController.h */,
+				B63612271B1CC38500289665 /* SpiroAnalyzeViewController.m */,
 				B63612291B1CC38500289665 /* Main.storyboard */,
-				B636122C1B1CC38500289665 /* Images.xcassets */,
-				B636122E1B1CC38500289665 /* LaunchScreen.xib */,
 				B636121F1B1CC38500289665 /* Supporting Files */,
 			);
 			path = OpenSpirometry;
@@ -96,6 +118,10 @@
 		B636121F1B1CC38500289665 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				B636122E1B1CC38500289665 /* LaunchScreen.xib */,
+				B636122C1B1CC38500289665 /* Images.xcassets */,
+				B63612231B1CC38500289665 /* AppDelegate.h */,
+				B63612241B1CC38500289665 /* AppDelegate.m */,
 				B63612201B1CC38500289665 /* Info.plist */,
 				B63612211B1CC38500289665 /* main.m */,
 			);
@@ -117,6 +143,46 @@
 				B636123A1B1CC38500289665 /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		B636124B1B1CC4C800289665 /* SpiroAnalysisModel */ = {
+			isa = PBXGroup;
+			children = (
+				B63612621B1FF93D00289665 /* Dependencies */,
+				B63612531B1CEB3C00289665 /* SpirometerEffortAnalyzer.h */,
+				B63612541B1CEB3C00289665 /* SpirometerEffortAnalyzer.m */,
+			);
+			name = SpiroAnalysisModel;
+			sourceTree = "<group>";
+		};
+		B63612621B1FF93D00289665 /* Dependencies */ = {
+			isa = PBXGroup;
+			children = (
+				B6A761681B21F47100EB4121 /* Custom DSP Utils */,
+				B6A761651B21107C00EB4121 /* FlowVolumeDataAnalyzer.h */,
+				B6A761661B21107C00EB4121 /* FlowVolumeDataAnalyzer.m */,
+				B6A761621B20C97A00EB4121 /* SpirometryWhistle.h */,
+				B6A761631B20C97A00EB4121 /* SpirometryWhistle.m */,
+				B6A7615B1B2009B700EB4121 /* SpirometerConstants.h */,
+			);
+			name = Dependencies;
+			sourceTree = "<group>";
+		};
+		B6A761681B21F47100EB4121 /* Custom DSP Utils */ = {
+			isa = PBXGroup;
+			children = (
+				B63612481B1CC48900289665 /* Novocaine.h */,
+				B63612491B1CC48900289665 /* Novocaine.m */,
+				B63612501B1CC70E00289665 /* FFTHelper.h */,
+				B63612511B1CC70E00289665 /* FFTHelper.m */,
+				B636125F1B1F556800289665 /* PeakFinder.h */,
+				B63612601B1F556800289665 /* PeakFinder.m */,
+				B63612591B1DFFB000289665 /* BufferedOverlapQueue.h */,
+				B636125A1B1DFFB000289665 /* BufferedOverlapQueue.m */,
+				B636125C1B1E26F500289665 /* DataBufferBlock.h */,
+				B636125D1B1E26F500289665 /* DataBufferBlock.m */,
+			);
+			name = "Custom DSP Utils";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -219,8 +285,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B63612281B1CC38500289665 /* ViewController.m in Sources */,
+				B636125E1B1E26F500289665 /* DataBufferBlock.m in Sources */,
+				B636124A1B1CC48900289665 /* Novocaine.m in Sources */,
+				B63612611B1F556800289665 /* PeakFinder.m in Sources */,
+				B636125B1B1DFFB000289665 /* BufferedOverlapQueue.m in Sources */,
+				B63612551B1CEB3C00289665 /* SpirometerEffortAnalyzer.m in Sources */,
+				B63612521B1CC70E00289665 /* FFTHelper.m in Sources */,
+				B63612281B1CC38500289665 /* SpiroAnalyzeViewController.m in Sources */,
 				B63612251B1CC38500289665 /* AppDelegate.m in Sources */,
+				B6A761641B20C97A00EB4121 /* SpirometryWhistle.m in Sources */,
+				B6A761671B21107C00EB4121 /* FlowVolumeDataAnalyzer.m in Sources */,
 				B63612221B1CC38500289665 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -416,6 +490,7 @@
 				B63612411B1CC38500289665 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		B63612421B1CC38500289665 /* Build configuration list for PBXNativeTarget "OpenSpirometryTests" */ = {
 			isa = XCConfigurationList;
@@ -424,6 +499,7 @@
 				B63612441B1CC38500289665 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
