@@ -10,10 +10,12 @@
 #import<QuartzCore/QuartzCore.h>
 
 @interface DataBufferBlock()
+
 @property (nonatomic,readwrite) NSUInteger writePosition;
 @property (nonatomic,readwrite) NSUInteger length;
 @property (nonatomic,readwrite) CFTimeInterval timeCreated;
 @property (nonatomic,readwrite) BOOL isFull;
+
 @end
 
 @implementation DataBufferBlock

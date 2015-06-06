@@ -22,7 +22,6 @@
 		B63612611B1F556800289665 /* PeakFinder.m in Sources */ = {isa = PBXBuildFile; fileRef = B63612601B1F556800289665 /* PeakFinder.m */; };
 		B6A761641B20C97A00EB4121 /* SpirometryWhistle.m in Sources */ = {isa = PBXBuildFile; fileRef = B6A761631B20C97A00EB4121 /* SpirometryWhistle.m */; };
 		B6A761671B21107C00EB4121 /* FlowVolumeDataAnalyzer.m in Sources */ = {isa = PBXBuildFile; fileRef = B6A761661B21107C00EB4121 /* FlowVolumeDataAnalyzer.m */; };
-		B6A7616A1B22378A00EB4121 /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = B6A761691B22378A00EB4121 /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -294,7 +293,6 @@
 				B636125B1B1DFFB000289665 /* BufferedOverlapQueue.m in Sources */,
 				B63612551B1CEB3C00289665 /* SpirometerEffortAnalyzer.m in Sources */,
 				B63612521B1CC70E00289665 /* FFTHelper.m in Sources */,
-				B6A7616A1B22378A00EB4121 /* README.md in Sources */,
 				B63612281B1CC38500289665 /* SpiroAnalyzeViewController.m in Sources */,
 				B63612251B1CC38500289665 /* AppDelegate.m in Sources */,
 				B6A761641B20C97A00EB4121 /* SpirometryWhistle.m in Sources */,
