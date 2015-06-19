@@ -68,7 +68,7 @@
 -(void)addFlowEstimateInLitersPerSecond:(float)flow withTimeStamp:(CFAbsoluteTime)time{
     // add flow and time
     [self.dynamicSampledFlow addObject:@(flow)];
-    [self.dynamicSampledTime addObject:@(flow)];
+    [self.dynamicSampledTime addObject:@(time)];
     
     // interpolate flow and add points(s) to curve
 }

@@ -51,6 +51,7 @@
         unsigned int didCancelEffort:1;
         unsigned int didEndEffortWithResults:1;
         unsigned int didUpdateFlowAndVolume:1;
+        unsigned int didUpdateAudioBufferWithMaximum:1;
     } delegateRespondsTo;
 }
 
@@ -64,6 +65,7 @@
         delegateRespondsTo.didCancelEffort = [_delegate respondsToSelector:@selector(didCancelEffort)];
         delegateRespondsTo.didEndEffortWithResults = [_delegate respondsToSelector:@selector(didEndEffortWithResults:)];
         delegateRespondsTo.didUpdateFlowAndVolume = [_delegate respondsToSelector:@selector(didUpdateFlow:andVolume:)];
+        delegateRespondsTo.didUpdateAudioBufferWithMaximum = [_delegate respondsToSelector:@selector(didUpdateAudioBufferWithMaximum:)];
     }
 }
 
@@ -140,6 +142,7 @@
     _silenceThreshold = 0;
     _silenceThresholdIsSet = NO;
     _currentStage = SpirometryStageIsIdle;
+    _prefferredAudioMaxUpdateIntervalInSeconds = 1.0/30.0; // 30FPS default
     
     _whistle = [[SpirometryWhistle alloc]init]; // whistle is set to default params (Sato Whistle)
     
@@ -279,10 +282,16 @@
              
              weakSelf.samplesRead += numFrames; // increment the total samples collected thus far
              
-             // analyze stage based on most recent data (super fast for small frame size here)
-             weakSelf.currentStage = [weakSelf analyzeStagesFromAudio:data withNumSamples:numFrames];
              
+             // get max of this buffer stream
+             float maxValue;
+             vDSP_maxv(data, 1, &maxValue, numFrames);
+             
+             // now get out of this block! It needs to run way too often
              dispatch_async(dispatch_get_main_queue(),^{
+                 // analyze stage based on most recent data (super fast for small frame size here)
+                 weakSelf.currentStage = [weakSelf analyzeStagesFromAudioMax:maxValue];
+                 
                  // shut down audio from main queue if needed
                  // this has sync code in it, so it might be a bit slow for the main queue
                  [weakSelf endEffortIfDone];
@@ -294,14 +303,12 @@
 }
 
 
--(SpirometryStage)analyzeStagesFromAudio:(float*)data withNumSamples:(UInt32)numFrames{
+-(SpirometryStage)analyzeStagesFromAudioMax:(float)maxValue{
+    
     static BOOL testStarted = NO;
     static CFTimeInterval lastGoodTime = 0;
     static CFTimeInterval testStartTime = 0;
     static CFTimeInterval silencedEndedStartTime = 0;
-    
-    float maxValue;
-    vDSP_maxv(data, 1, &maxValue, numFrames);
     
     if( self.samplesRead < BUFFER_SIZE*2){
         // still collecting samples for silence
@@ -322,13 +329,28 @@
         
         if(delegateRespondsTo.didFinishCalibratingSilence){
             dispatch_async(dispatch_get_main_queue(),^{
-                //TODO: delegation on main queue for did finish calibrating
+                //delegation on main queue for did finish calibrating
                 [self.delegate didFinishCalibratingSilence];
             });
         }
     }
     
     if(testStarted){
+        
+        // update the delegate about the audio
+        if(delegateRespondsTo.didUpdateAudioBufferWithMaximum){
+            static CFTimeInterval lastAudioUpdateTime = 0;
+            CFTimeInterval tempCurrTime = CACurrentMediaTime();
+            CFTimeInterval elapsedTimeForAudioUpdate = tempCurrTime-lastAudioUpdateTime;
+            if(lastAudioUpdateTime==0 || elapsedTimeForAudioUpdate >= self.prefferredAudioMaxUpdateIntervalInSeconds){
+                lastAudioUpdateTime = tempCurrTime;
+                dispatch_async(dispatch_get_main_queue(),^{
+                    //delegation on main queue for did finish calibrating
+                    [self.delegate didUpdateAudioBufferWithMaximum:maxValue];
+                });
+            }
+        }
+        
         CFTimeInterval elapsedTime = CACurrentMediaTime()-lastGoodTime;
         if(maxValue>TEST_END_THRESH*self.silenceThreshold){
             // audio still way above threshold
@@ -381,7 +403,7 @@
 // the block passed in is freed immediately after this executes
 -(void)didFillBuffer:(DataBufferBlock *)block{
     
-    CFAbsoluteTime timeInQueue = CACurrentMediaTime()-block.timeCreated;
+    //CFAbsoluteTime timeInQueue = CACurrentMediaTime()-block.timeCreated;
     
     const unsigned long lenMagBuffer = self.fftHelper.fftSizeOver2;
     float *fftMagnitudeBuffer = (float *)calloc(lenMagBuffer,sizeof(float));
@@ -431,31 +453,27 @@
         //TODO: handle frequency dropout
     }
     
-    
-    
-    
-    if(DEBUG)
-    {
-        // find maximum of spectrum, just some debug info here
-        float maxValue;
-        unsigned long maxIndex;
-        vDSP_maxvi(fftMagnitudeBuffer, 1, &maxValue, &maxIndex, lenMagBuffer);
-        
-        float interpolatedFrequency = [self.peakFinder getFrequencyFromIndex:maxIndex usingData:fftMagnitudeBuffer];
-        NSLog(@"Freq = %.2f, Mag=%.2f, QTime = %.2f, Blocks = %ld",
-              interpolatedFrequency,
-              maxValue,
-              timeInQueue,
-              (unsigned long)self.dataBuffer.numFullBuffers);
-    }
-    
+//    if(DEBUG)
+//    {
+//        // find maximum of spectrum, just some debug info here
+//        float maxValue;
+//        unsigned long maxIndex;
+//        vDSP_maxvi(fftMagnitudeBuffer, 1, &maxValue, &maxIndex, lenMagBuffer);
+//        
+//        float interpolatedFrequency = [self.peakFinder getFrequencyFromIndex:maxIndex usingData:fftMagnitudeBuffer];
+//        NSLog(@"Freq = %.2f, Mag=%.2f, QTime = %.2f, Blocks = %ld",
+//              interpolatedFrequency,
+//              maxValue,
+//              timeInQueue,
+//              (unsigned long)self.dataBuffer.numFullBuffers);
+//    }
     
     free(fftMagnitudeBuffer);
 }
 
 -(void)didFinishProcessingAllBuffers{
     // if number of buffers is all done, and we are shutting down
-    if(self.isShuttingDown){
+    if(self.isShuttingDown && self.currentStage==SpirometryStageIsFinished){
         
         self.currentStage = SpirometryStageIsAnalyzingResults;
         
@@ -469,7 +487,7 @@
             });
         }
         
-        // add this for synchronization of the serial main queue (not UI related, but simple calcualtion so meh)
+        // add this for synchronization of the serial main queue (not UI related, but simple calculation so, meh)
         dispatch_async(dispatch_get_main_queue(),^{
             self.currentStage = SpirometryStageIsIdle;
         });
@@ -503,6 +521,8 @@
     }
 }
 
+
+#pragma mark User Request Controls
 -(void)requestThatCurrentEffortShouldCancel{
     if(self.currentStage != SpirometryStageIsIdle){
         dispatch_async(dispatch_get_main_queue(),^{
@@ -521,7 +541,14 @@
     }
 }
 
-
+-(void)requestThatEffortShouldEnd{
+    // add this for synchronization of the serial main queue (not UI related, but simple calculation so, meh)
+    dispatch_async(dispatch_get_main_queue(),^{
+        NSLog(@"Requesting that effort should end, user inititated");
+        self.currentStage = SpirometryStageIsFinished;
+        [self endEffortIfDone];
+    });
+}
 
 
 

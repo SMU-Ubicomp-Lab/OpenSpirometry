@@ -45,7 +45,7 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Feedback for test happens here!" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="6" translatesAutoresizingMaskIntoConstraints="NO" id="UbL-i6-UCf">
-                                <rect key="frame" x="176.5" y="289" width="248.5" height="21"/>
+                                <rect key="frame" x="176" y="289" width="249" height="21"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="21" id="adk-VX-79K"/>
                                 </constraints>
@@ -65,11 +65,20 @@
                                 </variation>
                             </slider>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Flow: 0.0" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="5" translatesAutoresizingMaskIntoConstraints="NO" id="SnZ-Th-Ifk">
-                                <rect key="frame" x="506" y="327.5" width="70" height="20.5"/>
+                                <rect key="frame" x="506" y="327" width="70" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" red="0.60000002384185791" green="0.60000002384185791" blue="0.60000002384185791" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dsX-uB-b44">
+                                <rect key="frame" x="235" y="134" width="131" height="30"/>
+                                <state key="normal" title="Override End Effort">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="overrideEffort:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="eON-7x-T9k"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
@@ -81,9 +90,11 @@
                             <constraint firstItem="eWb-Yo-lMa" firstAttribute="top" secondItem="UbL-i6-UCf" secondAttribute="bottom" constant="8" symbolic="YES" id="B4M-ol-pIm"/>
                             <constraint firstItem="SnZ-Th-Ifk" firstAttribute="centerX" secondItem="eWb-Yo-lMa" secondAttribute="centerX" id="G8Q-a9-zmq"/>
                             <constraint firstItem="ubW-Gh-mGN" firstAttribute="centerX" secondItem="sBT-A9-C5i" secondAttribute="centerX" id="GKq-XH-Ufm"/>
+                            <constraint firstAttribute="centerX" secondItem="dsX-uB-b44" secondAttribute="centerX" constant="-0.5" id="H9u-OR-tLR"/>
                             <constraint firstItem="Zcf-qk-FU1" firstAttribute="centerX" secondItem="ubW-Gh-mGN" secondAttribute="centerX" id="JMt-ID-pjq"/>
                             <constraint firstItem="sBT-A9-C5i" firstAttribute="top" secondItem="jyV-Pf-zRb" secondAttribute="bottom" id="Lpc-3E-A3N"/>
                             <constraint firstAttribute="centerY" secondItem="UbL-i6-UCf" secondAttribute="centerY" id="OiA-bd-bHp"/>
+                            <constraint firstItem="dsX-uB-b44" firstAttribute="top" secondItem="Zcf-qk-FU1" secondAttribute="bottom" constant="8" id="V0j-ss-A2X"/>
                             <constraint firstItem="ubW-Gh-mGN" firstAttribute="top" secondItem="sBT-A9-C5i" secondAttribute="bottom" constant="8" symbolic="YES" id="ZUU-bl-2uS"/>
                             <constraint firstItem="SnZ-Th-Ifk" firstAttribute="bottom" secondItem="eWb-Yo-lMa" secondAttribute="bottom" id="cur-hS-ONx"/>
                             <constraint firstItem="eWb-Yo-lMa" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" id="gTJ-3T-Aoo"/>
@@ -126,7 +137,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="261" y="316"/>
+            <point key="canvasLocation" x="-153" y="308"/>
         </scene>
     </scenes>
 </document>

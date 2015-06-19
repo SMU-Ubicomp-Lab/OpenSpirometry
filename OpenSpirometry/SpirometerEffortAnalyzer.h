@@ -20,7 +20,8 @@
 -(void)willEndTestSoon;
 -(void)didCancelEffort;
 -(void)didEndEffortWithResults:(NSDictionary*)results;
--(void)didUpdateFlow:(float)flow andVolume:(float)volume;
+-(void)didUpdateFlow:(float)flowInLitersPerSecond andVolume:(float)volumeInLiters;
+-(void)didUpdateAudioBufferWithMaximum:(float)maxAudioValue;
 @end
 
 
@@ -29,9 +30,12 @@
 @property (nonatomic, weak) id <SpirometerEffortDelegate> delegate;
 @property (nonatomic) SpirometryStage currentStage;
 @property (strong, nonatomic) SpirometryWhistle* whistle;
+@property (nonatomic) float prefferredAudioMaxUpdateIntervalInSeconds;
 
 -(void)beginListeningForEffort;
 -(void)askPermissionToUseAudioIfNotDone;
 -(void)requestThatCurrentEffortShouldCancel;
+-(void)requestThatEffortShouldEnd;
+//-(void)requestEndEffortInSeconds:(int)seconds;
 
 @end
