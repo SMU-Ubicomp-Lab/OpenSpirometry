@@ -65,7 +65,6 @@
 		B6A761631B20C97A00EB4121 /* SpirometryWhistle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpirometryWhistle.m; sourceTree = "<group>"; };
 		B6A761651B21107C00EB4121 /* FlowVolumeDataAnalyzer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlowVolumeDataAnalyzer.h; sourceTree = "<group>"; };
 		B6A761661B21107C00EB4121 /* FlowVolumeDataAnalyzer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FlowVolumeDataAnalyzer.m; sourceTree = "<group>"; };
-		B6A761691B22378A00EB4121 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -119,7 +118,6 @@
 		B636121F1B1CC38500289665 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				B6A761691B22378A00EB4121 /* README.md */,
 				B636122E1B1CC38500289665 /* LaunchScreen.xib */,
 				B636122C1B1CC38500289665 /* Images.xcassets */,
 				B63612231B1CC38500289665 /* AppDelegate.h */,
