@@ -15,6 +15,7 @@
 @property (strong, nonatomic, readonly) NSNumber *fvcInLiters;
 @property (strong, nonatomic, readonly) NSNumber *fevOneOverFvc; // computed property
 @property (nonatomic,readonly) BOOL isFinalized;
+@property (nonatomic, readonly) float preferredSamplingInterval; //TODO: write setter
 
 -(void)addFlowEstimateInLitersPerSecond:(float)flow withTimeStamp:(CFAbsoluteTime)time;
 -(float)getEstimateOfTotalVolumeInLiters;

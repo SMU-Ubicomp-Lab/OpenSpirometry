@@ -239,9 +239,6 @@
     }];
 }
 
-
-
-
 #pragma mark Analyze Audio Methods
 
 -(void)setupAudio{
@@ -335,21 +332,21 @@
         }
     }
     
-    if(testStarted){
-        
-        // update the delegate about the audio
-        if(delegateRespondsTo.didUpdateAudioBufferWithMaximum){
-            static CFTimeInterval lastAudioUpdateTime = 0;
-            CFTimeInterval tempCurrTime = CACurrentMediaTime();
-            CFTimeInterval elapsedTimeForAudioUpdate = tempCurrTime-lastAudioUpdateTime;
-            if(lastAudioUpdateTime==0 || elapsedTimeForAudioUpdate >= self.prefferredAudioMaxUpdateIntervalInSeconds){
-                lastAudioUpdateTime = tempCurrTime;
-                dispatch_async(dispatch_get_main_queue(),^{
-                    //delegation on main queue for did finish calibrating
-                    [self.delegate didUpdateAudioBufferWithMaximum:maxValue];
-                });
-            }
+    // update the delegate about the audio (this will happen after calibrating silence)
+    if(delegateRespondsTo.didUpdateAudioBufferWithMaximum){
+        static CFTimeInterval lastAudioUpdateTime = 0;
+        CFTimeInterval tempCurrTime = CACurrentMediaTime();
+        CFTimeInterval elapsedTimeForAudioUpdate = tempCurrTime-lastAudioUpdateTime;
+        if(lastAudioUpdateTime==0 || elapsedTimeForAudioUpdate >= self.prefferredAudioMaxUpdateIntervalInSeconds){
+            lastAudioUpdateTime = tempCurrTime;
+            dispatch_async(dispatch_get_main_queue(),^{
+                //delegation on main queue for did finish calibrating
+                [self.delegate didUpdateAudioBufferWithMaximum:maxValue];
+            });
         }
+    }
+    
+    if(testStarted){
         
         CFTimeInterval elapsedTime = CACurrentMediaTime()-lastGoodTime;
         if(maxValue>TEST_END_THRESH*self.silenceThreshold){
