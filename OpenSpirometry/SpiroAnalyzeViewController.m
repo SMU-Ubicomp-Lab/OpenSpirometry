@@ -40,7 +40,7 @@
     // most likely this has a maximum update rate of about 100 FPS
     
     
-    self.buffer = [[NSMutableArray alloc] init];
+    self.buffer = @{};
     
 }
 
