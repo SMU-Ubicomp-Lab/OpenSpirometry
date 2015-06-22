@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5C1A31DD1B386ED4003DB35F /* APLGraphView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C1A31DC1B386ED4003DB35F /* APLGraphView.m */; };
 		B63612221B1CC38500289665 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B63612211B1CC38500289665 /* main.m */; };
 		B63612251B1CC38500289665 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B63612241B1CC38500289665 /* AppDelegate.m */; };
 		B63612281B1CC38500289665 /* SpiroAnalyzeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B63612271B1CC38500289665 /* SpiroAnalyzeViewController.m */; };
@@ -35,6 +36,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		5C1A31DB1B386ED4003DB35F /* APLGraphView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = APLGraphView.h; path = ThirdParty/APLGraphView/APLGraphView.h; sourceTree = "<group>"; };
+		5C1A31DC1B386ED4003DB35F /* APLGraphView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = APLGraphView.m; path = ThirdParty/APLGraphView/APLGraphView.m; sourceTree = "<group>"; };
 		B636121C1B1CC38500289665 /* OpenSpirometry.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OpenSpirometry.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B63612201B1CC38500289665 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B63612211B1CC38500289665 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -85,6 +88,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5C1A31DA1B386EC4003DB35F /* APLGraph */ = {
+			isa = PBXGroup;
+			children = (
+				5C1A31DB1B386ED4003DB35F /* APLGraphView.h */,
+				5C1A31DC1B386ED4003DB35F /* APLGraphView.m */,
+			);
+			name = APLGraph;
+			sourceTree = "<group>";
+		};
 		B63612131B1CC38500289665 = {
 			isa = PBXGroup;
 			children = (
@@ -106,6 +118,7 @@
 		B636121E1B1CC38500289665 /* OpenSpirometry */ = {
 			isa = PBXGroup;
 			children = (
+				5C1A31DA1B386EC4003DB35F /* APLGraph */,
 				B636124B1B1CC4C800289665 /* SpiroAnalysisModel */,
 				B63612261B1CC38500289665 /* SpiroAnalyzeViewController.h */,
 				B63612271B1CC38500289665 /* SpiroAnalyzeViewController.m */,
@@ -296,6 +309,7 @@
 				B6A761641B20C97A00EB4121 /* SpirometryWhistle.m in Sources */,
 				B6A761671B21107C00EB4121 /* FlowVolumeDataAnalyzer.m in Sources */,
 				B63612221B1CC38500289665 /* main.m in Sources */,
+				5C1A31DD1B386ED4003DB35F /* APLGraphView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -421,6 +435,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = OpenSpirometry/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -431,6 +446,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = OpenSpirometry/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";

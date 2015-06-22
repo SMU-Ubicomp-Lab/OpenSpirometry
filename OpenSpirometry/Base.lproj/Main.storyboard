@@ -79,15 +79,33 @@
                                     <action selector="overrideEffort:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="eON-7x-T9k"/>
                                 </connections>
                             </button>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0kb-X5-oRd" customClass="APLGraphView">
+                                <rect key="frame" x="4" y="395" width="592" height="166"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="166" id="eHb-bt-7lF"/>
+                                </constraints>
+                            </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hle-dI-Wzs">
+                                <rect key="frame" x="236" y="211" width="129" height="30"/>
+                                <state key="normal" title="Send Data via Mail">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="openMailDialog:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="jJf-AL-UzW"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstAttribute="centerX" secondItem="sBT-A9-C5i" secondAttribute="centerX" id="2pv-rm-lAn"/>
                             <constraint firstItem="eWb-Yo-lMa" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" constant="8" id="6Dh-1j-AO3"/>
+                            <constraint firstItem="0kb-X5-oRd" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" constant="-12" id="6s4-9f-tFb"/>
                             <constraint firstItem="SnZ-Th-Ifk" firstAttribute="leading" secondItem="eWb-Yo-lMa" secondAttribute="trailing" constant="8" id="8Tv-b0-p3i"/>
                             <constraint firstItem="Zcf-qk-FU1" firstAttribute="top" secondItem="ubW-Gh-mGN" secondAttribute="bottom" constant="8" symbolic="YES" id="8rb-dK-LaJ"/>
                             <constraint firstItem="SnZ-Th-Ifk" firstAttribute="top" secondItem="eWb-Yo-lMa" secondAttribute="bottom" constant="8" id="A74-Dc-qlE"/>
                             <constraint firstItem="eWb-Yo-lMa" firstAttribute="top" secondItem="UbL-i6-UCf" secondAttribute="bottom" constant="8" symbolic="YES" id="B4M-ol-pIm"/>
+                            <constraint firstItem="hle-dI-Wzs" firstAttribute="top" secondItem="dsX-uB-b44" secondAttribute="bottom" constant="47" id="Ce8-2p-wS5"/>
                             <constraint firstItem="SnZ-Th-Ifk" firstAttribute="centerX" secondItem="eWb-Yo-lMa" secondAttribute="centerX" id="G8Q-a9-zmq"/>
                             <constraint firstItem="ubW-Gh-mGN" firstAttribute="centerX" secondItem="sBT-A9-C5i" secondAttribute="centerX" id="GKq-XH-Ufm"/>
                             <constraint firstAttribute="centerX" secondItem="dsX-uB-b44" secondAttribute="centerX" constant="-0.5" id="H9u-OR-tLR"/>
@@ -96,9 +114,13 @@
                             <constraint firstAttribute="centerY" secondItem="UbL-i6-UCf" secondAttribute="centerY" id="OiA-bd-bHp"/>
                             <constraint firstItem="dsX-uB-b44" firstAttribute="top" secondItem="Zcf-qk-FU1" secondAttribute="bottom" constant="8" id="V0j-ss-A2X"/>
                             <constraint firstItem="ubW-Gh-mGN" firstAttribute="top" secondItem="sBT-A9-C5i" secondAttribute="bottom" constant="8" symbolic="YES" id="ZUU-bl-2uS"/>
+                            <constraint firstAttribute="centerX" secondItem="0kb-X5-oRd" secondAttribute="centerX" id="c6o-SI-doQ"/>
                             <constraint firstItem="SnZ-Th-Ifk" firstAttribute="bottom" secondItem="eWb-Yo-lMa" secondAttribute="bottom" id="cur-hS-ONx"/>
                             <constraint firstItem="eWb-Yo-lMa" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" id="gTJ-3T-Aoo"/>
+                            <constraint firstAttribute="centerY" secondItem="0kb-X5-oRd" secondAttribute="centerY" constant="-178" id="kn8-TO-3pg"/>
+                            <constraint firstItem="hle-dI-Wzs" firstAttribute="centerX" secondItem="UbL-i6-UCf" secondAttribute="centerX" id="ktt-SY-ykp"/>
                             <constraint firstAttribute="trailingMargin" secondItem="SnZ-Th-Ifk" secondAttribute="trailing" constant="8" id="mPC-2i-IzP"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="0kb-X5-oRd" secondAttribute="trailing" constant="-12" id="o8f-hp-HLl"/>
                             <constraint firstItem="eWb-Yo-lMa" firstAttribute="top" secondItem="UbL-i6-UCf" secondAttribute="bottom" constant="8" id="vu1-3J-vE6"/>
                             <constraint firstItem="UbL-i6-UCf" firstAttribute="centerX" secondItem="Zcf-qk-FU1" secondAttribute="centerX" id="xZW-XF-mg5"/>
                             <constraint firstItem="eWb-Yo-lMa" firstAttribute="centerX" secondItem="Zcf-qk-FU1" secondAttribute="centerX" id="xjv-LQ-eRk"/>
@@ -133,6 +155,7 @@
                         <outlet property="feedbackLabel" destination="UbL-i6-UCf" id="NGK-Jt-65j"/>
                         <outlet property="flowLabel" destination="SnZ-Th-Ifk" id="pVf-gG-ITu"/>
                         <outlet property="flowSlider" destination="eWb-Yo-lMa" id="yCw-vx-ul9"/>
+                        <outlet property="graphView" destination="0kb-X5-oRd" id="LQN-Sa-Bkj"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>

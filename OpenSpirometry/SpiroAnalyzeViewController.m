@@ -10,15 +10,20 @@
 
 #import "SpiroAnalyzeViewController.h"
 #import "SpirometerEffortAnalyzer.h"
+#import "APLGraphView.h"
 
-@interface SpiroAnalyzeViewController ()
+@interface SpiroAnalyzeViewController () 
 
 @property (weak, nonatomic) IBOutlet UISlider *flowSlider;
 @property (weak, nonatomic) IBOutlet UILabel *feedbackLabel;
 @property (weak, nonatomic) IBOutlet UILabel *flowLabel;
+@property (weak, nonatomic) IBOutlet APLGraphView *graphView;
 
 // our model of the spirometry analysis for one effort
 @property (strong, nonatomic) SpirometerEffortAnalyzer* spiro;
+
+// Used to stored the flow data, and send it via email.
+@property (strong, nonatomic) NSMutableArray *buffer;
 
 @end
 
@@ -33,6 +38,9 @@
     self.spiro.prefferredAudioMaxUpdateIntervalInSeconds = 1.0/24.0; // the default is 30FPS, so setting lower
     // the FPS possible on this depends on the audio buffer size and sampling rate, which is different for different phones
     // most likely this has a maximum update rate of about 100 FPS
+    
+    
+    self.buffer = [[NSMutableArray alloc] init];
     
 }
 
@@ -94,6 +102,11 @@
     
     self.flowSlider.value = flow; // watch it jump around when updated
     self.flowLabel.text = [NSString stringWithFormat:@"Flow: %.2f",flow];
+    
+    
+    [self.graphView addX:flow y:0 z:0];
+    
+    [self.buffer addObject:@(flow)];
 }
 
 -(void)didUpdateAudioBufferWithMaximum:(float)maxAudioValue{
@@ -103,4 +116,75 @@
     NSLog(@"Audio Max: %.4f", maxAudioValue);
 }
 
+#pragma mark Mail
+
+-(NSString*)toString:(NSMutableArray*) dataBuffer
+{
+    NSMutableString * result = [[NSMutableString alloc] init];
+    for (NSObject * obj in dataBuffer)
+    {
+        [result appendString:[obj description]];
+        [result appendString:@"\n"];
+    }
+    
+    return result;
+
+}
+
+- (IBAction)openMailDialog:(id)sender
+{
+
+    
+    if ([MFMailComposeViewController canSendMail])
+    {
+        MFMailComposeViewController *mailer = [[MFMailComposeViewController alloc] init];
+        
+        mailer.mailComposeDelegate = self;
+        
+        [mailer setSubject:@"OpenSpirometry Data"];
+
+        
+        NSString *emailBody = [self toString:self.buffer];
+        [mailer setMessageBody:emailBody isHTML:NO];
+        
+        [self presentViewController:mailer animated:YES completion:nil];
+
+    }
+    else
+    {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Failure"
+                                                        message:@"Your device doesn't support the composer sheet"
+                                                       delegate:nil
+                                              cancelButtonTitle:@"OK"
+                                              otherButtonTitles: nil];
+        [alert show];
+    }
+    
+}
+
+
+- (void)mailComposeController:(MFMailComposeViewController*)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError*)error
+{
+    switch (result)
+    {
+        case MFMailComposeResultCancelled:
+            NSLog(@"Mail cancelled: you cancelled the operation and no email message was queued.");
+            break;
+        case MFMailComposeResultSaved:
+            NSLog(@"Mail saved: you saved the email message in the drafts folder.");
+            break;
+        case MFMailComposeResultSent:
+            NSLog(@"Mail send: the email message is queued in the outbox. It is ready to send.");
+            break;
+        case MFMailComposeResultFailed:
+            NSLog(@"Mail failed: the email message was not saved or queued, possibly due to an error.");
+            break;
+        default:
+            NSLog(@"Mail not sent.");
+            break;
+    }
+    
+    // Remove the mail view
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
 @end

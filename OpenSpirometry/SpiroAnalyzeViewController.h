@@ -7,10 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <MessageUI/MessageUI.h>
+
 #import "SpirometerEffortAnalyzer.h"
 
-@interface SpiroAnalyzeViewController : UIViewController <SpirometerEffortDelegate>
+@interface SpiroAnalyzeViewController : UIViewController <SpirometerEffortDelegate, MFMailComposeViewControllerDelegate>
 
+- (IBAction)openMailDialog:(id)sender;
 
 @end
 
