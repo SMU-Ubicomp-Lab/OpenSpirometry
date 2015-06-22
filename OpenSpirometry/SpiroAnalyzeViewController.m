@@ -23,7 +23,7 @@
 @property (strong, nonatomic) SpirometerEffortAnalyzer* spiro;
 
 // Used to stored the flow data, and send it via email.
-@property (strong, nonatomic) NSMutableArray *buffer;
+@property (strong, nonatomic) NSDictionary *buffer;
 
 @end
 
@@ -92,6 +92,8 @@
     // in the future the results of the effort will all be stored as key/value pairs
     NSLog(@"%@",results);
     self.feedbackLabel.text = @"Effort Complete. Thanks!";
+    
+    self.buffer = results; // save data for sensing to the user
 }
 
 -(void)didUpdateFlow:(float)flow andVolume:(float)volume{
@@ -106,7 +108,6 @@
     
     [self.graphView addX:flow y:0 z:0];
     
-    [self.buffer addObject:@(flow)];
 }
 
 -(void)didUpdateAudioBufferWithMaximum:(float)maxAudioValue{
@@ -143,8 +144,8 @@
         
         [mailer setSubject:@"OpenSpirometry Data"];
 
-        
-        NSString *emailBody = [self toString:self.buffer];
+        // grab the data from the results buffer (if it exists) and send via email
+        NSString *emailBody = [self toString:[self.buffer valueForKey:@"FlowCurveInLitersPerSecond"]];
         [mailer setMessageBody:emailBody isHTML:NO];
         
         [self presentViewController:mailer animated:YES completion:nil];
