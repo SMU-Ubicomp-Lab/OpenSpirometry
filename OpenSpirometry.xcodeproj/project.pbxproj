@@ -20,6 +20,7 @@
 		B636125B1B1DFFB000289665 /* BufferedOverlapQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = B636125A1B1DFFB000289665 /* BufferedOverlapQueue.m */; };
 		B636125E1B1E26F500289665 /* DataBufferBlock.m in Sources */ = {isa = PBXBuildFile; fileRef = B636125D1B1E26F500289665 /* DataBufferBlock.m */; };
 		B63612611B1F556800289665 /* PeakFinder.m in Sources */ = {isa = PBXBuildFile; fileRef = B63612601B1F556800289665 /* PeakFinder.m */; };
+		B644C62A1B619C29002D3484 /* VortexWhistleRed.m4a in Resources */ = {isa = PBXBuildFile; fileRef = B644C6291B619C29002D3484 /* VortexWhistleRed.m4a */; };
 		B6A761641B20C97A00EB4121 /* SpirometryWhistle.m in Sources */ = {isa = PBXBuildFile; fileRef = B6A761631B20C97A00EB4121 /* SpirometryWhistle.m */; };
 		B6A761671B21107C00EB4121 /* FlowVolumeDataAnalyzer.m in Sources */ = {isa = PBXBuildFile; fileRef = B6A761661B21107C00EB4121 /* FlowVolumeDataAnalyzer.m */; };
 /* End PBXBuildFile section */
@@ -60,6 +61,7 @@
 		B636125D1B1E26F500289665 /* DataBufferBlock.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataBufferBlock.m; sourceTree = "<group>"; };
 		B636125F1B1F556800289665 /* PeakFinder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PeakFinder.h; sourceTree = "<group>"; };
 		B63612601B1F556800289665 /* PeakFinder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PeakFinder.m; sourceTree = "<group>"; };
+		B644C6291B619C29002D3484 /* VortexWhistleRed.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = VortexWhistleRed.m4a; sourceTree = "<group>"; };
 		B6A7615B1B2009B700EB4121 /* SpirometerConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SpirometerConstants.h; sourceTree = "<group>"; };
 		B6A761621B20C97A00EB4121 /* SpirometryWhistle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpirometryWhistle.h; sourceTree = "<group>"; };
 		B6A761631B20C97A00EB4121 /* SpirometryWhistle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpirometryWhistle.m; sourceTree = "<group>"; };
@@ -118,6 +120,7 @@
 		B636121F1B1CC38500289665 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				B644C6291B619C29002D3484 /* VortexWhistleRed.m4a */,
 				B636122E1B1CC38500289665 /* LaunchScreen.xib */,
 				B636122C1B1CC38500289665 /* Images.xcassets */,
 				B63612231B1CC38500289665 /* AppDelegate.h */,
@@ -266,6 +269,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B636122B1B1CC38500289665 /* Main.storyboard in Resources */,
+				B644C62A1B619C29002D3484 /* VortexWhistleRed.m4a in Resources */,
 				B63612301B1CC38500289665 /* LaunchScreen.xib in Resources */,
 				B636122D1B1CC38500289665 /* Images.xcassets in Resources */,
 			);

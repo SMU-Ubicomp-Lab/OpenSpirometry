@@ -12,7 +12,7 @@
 #define BUFFER_SIZE         22050
 #define BUFFER_OVERLAP      BUFFER_SIZE-BUFFER_SIZE/100 // overlap, readings per second = Fs/BUFFER_SIZE * divisor 
 #define PEAK_WINDOW_SIZE    20 // num frequency bins to search over for local maxima
-#define TIME_OUT_WAIT_FOR_TEST_START 5
+#define TIME_OUT_WAIT_FOR_TEST_START 10
 
 
 // All these need calibration (SPIRO: needs calibration)

@@ -35,7 +35,7 @@
 extern "C" {
 #endif
 
-    void CheckError(OSStatus error, const char *operation);
+    //void CheckError(OSStatus error, const char *operation);
 
     
 OSStatus inputCallback (void						*inRefCon,
@@ -70,38 +70,8 @@ typedef void (^OutputBlock)(float *data, UInt32 numFrames, UInt32 numChannels);
 typedef void (^InputBlock)(float *data, UInt32 numFrames, UInt32 numChannels);
 
 @interface Novocaine : NSObject 
-{    
-	// Audio Handling
-	AudioUnit inputUnit;
-    AudioUnit outputUnit;
-    AudioBufferList *inputBuffer;
-    
-	// Session Properties
-	BOOL inputAvailable;
-	NSString *inputRoute;
-	UInt32 numInputChannels;
-	UInt32 numOutputChannels;
-    Float64 samplingRate;
-    BOOL isInterleaved;
-    UInt32 numBytesPerSample;
-    AudioStreamBasicDescription inputFormat;
-    AudioStreamBasicDescription outputFormat;
-	
-	// Audio Processing
-    OutputBlock outputBlock;
-    InputBlock inputBlock;
-    
-	float *inData;
-    float *outData;
-	
-	BOOL playing;
-    // BOOL playThroughEnabled;
-    
-    
-}
 
 @property AudioUnit inputUnit;
-@property AudioUnit outputUnit;
 @property AudioBufferList *inputBuffer;
 @property (nonatomic, copy) OutputBlock outputBlock;
 @property (nonatomic, copy) InputBlock inputBlock;
@@ -135,6 +105,8 @@ typedef void (^InputBlock)(float *data, UInt32 numFrames, UInt32 numChannels);
 
 - (void)checkSessionProperties;
 - (void)checkAudioSource;
+
+-(void) overrideMicrophoneWithAudioFile:(NSString*)audioFileName;
 
 + (enum AVAudioSessionRecordPermission)checkAudioAuthorization;
 

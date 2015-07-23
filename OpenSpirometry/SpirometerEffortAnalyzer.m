@@ -39,6 +39,9 @@
 @property (nonatomic) float silenceThreshold;
 @property (nonatomic) BOOL silenceThresholdIsSet;
 
+@property (nonatomic) BOOL audioDebugIsActive;
+@property (nonatomic, strong) NSString *audioDebugFileName;
+
 @end
 
 
@@ -69,12 +72,17 @@
     }
 }
 
-
+//=============================================================================================================
 #pragma mark Lazy Instantiation
 -(Novocaine*)audioManager{
     if(!_audioManager){
         _audioManager = [Novocaine audioManager];
         
+        
+        if(_audioDebugIsActive){
+            [_audioManager overrideMicrophoneWithAudioFile:_audioDebugFileName];
+        }
+
         // and the other properties dependent here
         _frequencyResolution = ((float)BUFFER_SIZE)/_audioManager.samplingRate;
         _peakFinder = [[PeakFinder alloc]initWithFrequencyResolution:_frequencyResolution];
@@ -90,6 +98,7 @@
     return _fftHelper;
 }
 
+//=============================================================================================================
 #pragma mark Init/Dealloc
 // set up as singleton class
 + (SpirometerEffortAnalyzer *) spirometerAnalyzer
@@ -143,6 +152,8 @@
     _silenceThresholdIsSet = NO;
     _currentStage = SpirometryStageIsIdle;
     _prefferredAudioMaxUpdateIntervalInSeconds = 1.0/30.0; // 30FPS default
+    _audioDebugIsActive = NO;
+    _audioDebugFileName = nil;
     
     _whistle = [[SpirometryWhistle alloc]init]; // whistle is set to default params (Sato Whistle)
     
@@ -150,6 +161,7 @@
     
 }
 
+//=============================================================================================================
 #pragma mark Permission
 // return if successful
 -(void)askPermissionToUseAudioIfNotDone{
@@ -239,6 +251,7 @@
     }];
 }
 
+//=============================================================================================================
 #pragma mark Analyze Audio Methods
 
 -(void)setupAudio{
@@ -268,11 +281,11 @@
     
     // audio instantiated here if neccessary (will generate microphone ask if not set)
     // grab non-reference count adding handle to ourselves
-    __block __weak typeof(self) weakSelf = self;
+    __block SpirometerEffortAnalyzer * __weak  weakSelf = self;
     [self.audioManager setInputBlock:^(float *data, UInt32 numFrames, UInt32 numChannels)
      {
          // add data to the ring buffer (interleaved in case iOS upgrades microphone or test is over airplay)
-         if(weakSelf && !weakSelf.isShuttingDown){
+         if(weakSelf != nil && !weakSelf.isShuttingDown){
              
              // copy data over to overlap buffer
              [weakSelf.dataBuffer addFreshInterleavedFloatData:data withLength:numFrames fromChannel:0 withNumChannels:numChannels];
@@ -436,7 +449,7 @@
                                             withTimeStamp:block.timeCreated]; // original time stamp for audio
         
         // query running volume from analyzer (using the new flow we just passed in)
-        volume = [self.fvAnalyzer getEstimateOfTotalVolumeInLiters]; // TODO: model currently just returns zero, will be built out later
+        volume = [self.fvAnalyzer getEstimateOfTotalVolumeInLiters];
         
         // call delegate did update flow and volume on main queue
         if(delegateRespondsTo.didUpdateFlowAndVolume){
@@ -519,6 +532,7 @@
 }
 
 
+//=============================================================================================================
 #pragma mark User Request Controls
 -(void)requestThatCurrentEffortShouldCancel{
     if(self.currentStage != SpirometryStageIsIdle){
@@ -526,7 +540,9 @@
             self.isShuttingDown = YES; // this function should only be called from main queue so no semaphore needed
             NSLog(@"Effort cancelled");
             [self.audioManager pause]; // stop
-            [self.dataBuffer clear];
+            
+            [self.dataBuffer processRemainingBlocks]; // kill remainder of queue
+            [self.dataBuffer clear]; // and throw it away
             
             self.currentStage = SpirometryStageIsIdle;
             
@@ -541,10 +557,32 @@
 -(void)requestThatEffortShouldEnd{
     // add this for synchronization of the serial main queue (not UI related, but simple calculation so, meh)
     dispatch_async(dispatch_get_main_queue(),^{
-        NSLog(@"Requesting that effort should end, user inititated");
-        self.currentStage = SpirometryStageIsFinished;
-        [self endEffortIfDone];
+       
+        if(self.currentStage > SpirometryStageIsWaitingForTestToBegin){
+             NSLog(@"Requesting that effort should end without canceling, user inititated");
+            self.currentStage = SpirometryStageIsFinished;
+            [self endEffortIfDone];
+        }
+        else{
+             NSLog(@"Cannot end test because no valid start was found, canceling");
+            [self requestThatCurrentEffortShouldCancel];
+        }
     });
+}
+
+//=============================================================================================================
+#pragma mark Debug Options
+-(void)activateDebugAudioModeWithWAVFile:(NSString*)filename{
+    self.audioDebugIsActive = YES;
+    if(filename)
+        self.audioDebugFileName = filename;
+    else
+        self.audioDebugFileName = @"VortexWhistleRed";
+    
+    // set it, if we can, otherwise set at time of creation
+    if(_audioManager){
+        [self.audioManager overrideMicrophoneWithAudioFile:self.audioDebugFileName];
+    }
 }
 
 

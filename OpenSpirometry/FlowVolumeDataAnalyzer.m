@@ -7,6 +7,7 @@
 //
 
 #import "FlowVolumeDataAnalyzer.h"
+#import <Accelerate/Accelerate.h>
 
 @interface FlowVolumeDataAnalyzer()
 
@@ -119,7 +120,11 @@
             fillTime += self.preferredSamplingInterval;
         }
         
-    //TODO: spline interpolations as num points is better for estimate
+    }
+    else // add if statement
+    {
+        // TODO: spline interpolations as num points is better for estimate
+        
     }
 }
 
@@ -141,8 +146,23 @@
 #pragma mark Query Data Functions
 -(NSDictionary*)finalizeCurvesAndGetResults{
     
-    //TODO: perform any filtering of the flow rate
+    // TODO: check output and be sure this returns properly encapsulated, THIS IS NOT RETURNED YET
+    // perform filtering of the flow rate
+    NSMutableArray *filteredFlow = [self filterArray:self.constantSampledFlowInLitersPerSecond
+                                       withFIRFilter:@[@0.00612500495896, @0.133331686187, @0.100128804544, @0.127394330804, @0.143746190497, @0.149443061676, @0.143746190497, @0.127394330804, @0.100128804544, @0.133331686187, @0.00612500495896]]; // lowpass filter created in python
+// GENERATED VIA:----------------------------------------
+//    from scipy.signal import fir_filter_design as fir
+//    from scipy.signal import freqz
+//    fir_taps = fir.remez(numtaps=11, bands=[0, 0.05, 0.1, 0.5],desired=[1,0])
+//    w, h = freqz(fir_taps)
+//-------------------------------------------------------
+    
+    
+    //TODO: perform sharpness enhancement at the beginning of the test or try to use raw values to avoid biasing beginning of the test with filtering (important when use curve back propagation later on for detecting insufficient starts)
+    
+    //TODO: adjust time series samples to begin at zero with the start of the test
     //TODO: add in effort error checking (after the test)
+    
     
     // Failures:{didCough, insufficient, early stop, bad start}
     // data: flowVolume, flowTime, volumeTime, common scalar measures
@@ -165,6 +185,83 @@
     return [self.constantSampledVolumeInLiters lastObject] ?
                 ((NSNumber*)[self.constantSampledVolumeInLiters lastObject]).floatValue : 0;
 }
+
+
+// maybe move this to a Util section
+-(NSMutableArray*)filterArray:(NSArray*)series withFIRFilter:(NSArray*)coefficients{
+    vDSP_Length lengthOfFilter = coefficients.count;
+    vDSP_Length lengthOfResult = series.count+coefficients.count-1; // how does vDSP filter use "result" because it seems like this should just be the size of the input array to be filtered, but the name suggests differently. Look into this
+    
+    float *timeSeriesAsFloat = (float*)calloc(series.count,sizeof(float));
+    float *filterAsFloat = (float*)calloc(coefficients.count,sizeof(float));
+    float *outputAsFloat = (float*)calloc(series.count+coefficients.count-1,sizeof(float));
+    float *pEndOfFilterAsFloat;
+    
+    // copy over as floats for processing
+    for(int i=0;i<series.count;i++){
+        timeSeriesAsFloat[i] = [[series objectAtIndex:i] floatValue];
+    }
+    
+    for(int i=0;i<coefficients.count;i++){
+        filterAsFloat[i] = [[coefficients objectAtIndex:i] floatValue];
+    }
+    
+    pEndOfFilterAsFloat = &filterAsFloat[coefficients.count-1];
+    
+    //perform filtering
+    vDSP_conv(timeSeriesAsFloat, 1, pEndOfFilterAsFloat, -1, outputAsFloat, 1, lengthOfResult, lengthOfFilter);
+    
+    // encapsulate the output and only copy over valid portions after processing
+    NSMutableArray *outputEncapsulated = [[NSMutableArray alloc]initWithCapacity:series.count];
+    for(int i=0;i<series.count;i++){
+        outputEncapsulated[i] = @(outputAsFloat[i]);
+    }
+    
+    free(timeSeriesAsFloat);
+    free(outputAsFloat);
+    free(filterAsFloat);
+    
+    return outputEncapsulated;
+}
+
+
+//// maybe move this to a Util section
+//-(NSMutableArray*)filterArray:(NSArray*)series withIIRNumerator:(NSArray*)num andDenominator:(NSArray*)den{
+//    vDSP_Length lengthOfFilter = coefficients.count;
+//    vDSP_Length lengthOfResult = series.count+coefficients.count-1; // how does vDSP filter use "result" because it seems like this should just be the size of the input array to be filtered, but the name suggests differently. Look into this
+//    
+//    float *timeSeriesAsFloat = (float*)calloc(series.count,sizeof(float));
+//    float *filterAsFloat = (float*)calloc(coefficients.count,sizeof(float));
+//    float *outputAsFloat = (float*)calloc(series.count+coefficients.count-1,sizeof(float));
+//    float *pEndOfFilterAsFloat;
+//    
+//    // copy over as floats for processing
+//    for(int i=0;i<series.count;i++){
+//        timeSeriesAsFloat[i] = [[series objectAtIndex:i] floatValue];
+//    }
+//    
+//    for(int i=0;i<coefficients.count;i++){
+//        filterAsFloat[i] = [[coefficients objectAtIndex:i] floatValue];
+//    }
+//    
+//    pEndOfFilterAsFloat = &filterAsFloat[coefficients.count-1];
+//    
+//    //perform filtering
+//    vDSP_conv(timeSeriesAsFloat, 1, pEndOfFilterAsFloat, -1, outputAsFloat, 1, lengthOfResult, lengthOfFilter);
+//    vDSP_
+//    
+//    // encapsulate the output and only copy over valid portions after processing
+//    NSMutableArray *outputEncapsulated = [[NSMutableArray alloc]initWithCapacity:series.count];
+//    for(int i=0;i<series.count;i++){
+//        outputEncapsulated[i] = @(outputAsFloat[i]);
+//    }
+//    
+//    free(timeSeriesAsFloat);
+//    free(outputAsFloat);
+//    free(filterAsFloat);
+//    
+//    return outputEncapsulated;
+//}
 
 
 @end

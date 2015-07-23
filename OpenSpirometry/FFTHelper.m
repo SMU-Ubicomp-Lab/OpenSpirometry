@@ -232,7 +232,7 @@
     
     // multiply by window w/ overlap-add
     
-    float *p = self.timeSeries; // allocated here if not set
+    float *p = _timeSeries; // allocated here if not set
     for (int i = 0; i < self.fftSize; i++) {
         *p++ += _out_real[i] * _window[i];
     }

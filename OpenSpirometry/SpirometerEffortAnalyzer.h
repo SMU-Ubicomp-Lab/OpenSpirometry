@@ -32,10 +32,13 @@
 @property (strong, nonatomic) SpirometryWhistle* whistle;
 @property (nonatomic) float prefferredAudioMaxUpdateIntervalInSeconds;
 
+
 -(void)beginListeningForEffort;
 -(void)askPermissionToUseAudioIfNotDone;
 -(void)requestThatCurrentEffortShouldCancel;
 -(void)requestThatEffortShouldEnd;
+-(void)activateDebugAudioModeWithWAVFile:(NSString*)filenameAndPath;
+
 //-(void)requestEndEffortInSeconds:(int)seconds;
 
 @end

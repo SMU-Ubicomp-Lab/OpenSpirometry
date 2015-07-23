@@ -34,6 +34,9 @@
     // the FPS possible on this depends on the audio buffer size and sampling rate, which is different for different phones
     // most likely this has a maximum update rate of about 100 FPS
     
+    // for debugging: this turns on the debug mode for reading the effort from a file (only wav currently supported)
+    [self.spiro activateDebugAudioModeWithWAVFile:nil]; // default audio file name
+    
 }
 
 #pragma mark IBActions From View
