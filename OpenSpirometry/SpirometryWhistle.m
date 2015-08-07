@@ -50,7 +50,6 @@
     _dimensions.Lit = 40;
     
     [self calculateTermsFromDimensions];
-    
 }
 
 -(void)setAsWhistleWithDimensions:(struct WhistleDimensions)structDims {

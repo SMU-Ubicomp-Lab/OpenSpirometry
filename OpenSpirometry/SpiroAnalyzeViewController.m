@@ -34,8 +34,8 @@
     // the FPS possible on this depends on the audio buffer size and sampling rate, which is different for different phones
     // most likely this has a maximum update rate of about 100 FPS
     
-    // for debugging: this turns on the debug mode for reading the effort from a file (only wav currently supported)
-    [self.spiro activateDebugAudioModeWithWAVFile:nil]; // default audio file name
+    // **for debugging**: this turns on the debug mode for reading the effort from a file (only wav currently supported)
+    [self.spiro activateDebugAudioModeWithWAVFile:@"VortexWhistleRed"]; // default audio file name
     
 }
 
@@ -85,7 +85,10 @@
 -(void)didEndEffortWithResults:(NSDictionary*)results{
     // right now results are an empty dictionary
     // in the future the results of the effort will all be stored as key/value pairs
-    NSLog(@"%@",results);
+    for(int i=0;i<((NSArray*)results[@"FlowCurveInLitersPerSecond"]).count;i++){
+        printf("%.4f\t%.4f\n",[results[@"TimeStampsForFlowAndVolume"][i] floatValue],[results[@"FlowCurveInLitersPerSecond"][i] floatValue]);
+    }
+    //NSLog(@"%@",results[@"FlowCurveInLitersPerSecond"]);
     self.feedbackLabel.text = @"Effort Complete. Thanks!";
 }
 
@@ -103,7 +106,8 @@
     // once silence has been calibrated, you will start getting this message
     // This happens many times per second, depending on the preferred time interval (default is 30 times per scond)
     // for updating a game UI quickly, this is the better option but does not give you a valid flow rate
-    NSLog(@"Audio Max: %.4f", maxAudioValue);
+    // this outputs lots of data ot console, beware
+    //NSLog(@"Audio Max: %.4f", maxAudioValue);
 }
 
 @end

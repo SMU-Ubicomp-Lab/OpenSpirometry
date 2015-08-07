@@ -827,6 +827,12 @@ void CheckError(OSStatus error, const char *operation)
     
     NSString * source = [[NSBundle mainBundle] pathForResource:name ofType:@"m4a"]; // SPECIFY YOUR FILE FORMAT
     
+    if(source==nil){
+        [NSException raise:@"BadFileAccess"
+                    format:[NSString stringWithFormat:@"File provided does not exist, %@",name]
+                 arguments:nil];
+    }
+    
     const char *cString = [source cStringUsingEncoding:NSASCIIStringEncoding];
     
     CFStringRef str = CFStringCreateWithCString(

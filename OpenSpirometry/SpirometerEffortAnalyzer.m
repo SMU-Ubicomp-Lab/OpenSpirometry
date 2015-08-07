@@ -320,7 +320,7 @@
     static CFTimeInterval testStartTime = 0;
     static CFTimeInterval silencedEndedStartTime = 0;
     
-    if( self.samplesRead < BUFFER_SIZE*2){
+    if( self.samplesRead < self.audioManager.samplingRate*2){
         // still collecting samples for silence
         //reset state
         testStarted = NO;
@@ -332,7 +332,7 @@
         self.silenceThreshold = maxValue>self.silenceThreshold ? maxValue : self.silenceThreshold;
         return SpirometryStageIsCalibratingSilence;
     }
-    else if(!self.silenceThresholdIsSet && self.samplesRead >= BUFFER_SIZE*2){
+    else if(!self.silenceThresholdIsSet && self.samplesRead >= self.audioManager.samplingRate*2){
         // just finished getting all the samples here, lock in silence threshold and notify delegate
         self.silenceThresholdIsSet = YES; // now we are set
         silencedEndedStartTime = CACurrentMediaTime();
@@ -414,20 +414,25 @@
 -(void)didFillBuffer:(DataBufferBlock *)block{
     
     //CFAbsoluteTime timeInQueue = CACurrentMediaTime()-block.timeCreated;
+    static float lastFrequency = -1.0;
     
     const unsigned long lenMagBuffer = self.fftHelper.fftSizeOver2;
     float *fftMagnitudeBuffer = (float *)calloc(lenMagBuffer,sizeof(float));
     
     // take FFT
     [self.fftHelper performForwardFFTWithData:block.data
-                     andCopydBMagnitudeToBuffer:fftMagnitudeBuffer];
+                   andCopydBMagnitudeToBuffer:fftMagnitudeBuffer];
     
     
     // find local maxima and identify most likely harmonics of whistle (returns nil if none exist)
+    float minimumMagnitude = PEAK_DBMAG_START;
+    if(lastFrequency>0)
+        minimumMagnitude = PEAK_DBMAG_SUSTAINED;
+    
     NSArray *fundamentalFrequencies = [self.peakFinder getFundamentalPeaksFromBuffer:fftMagnitudeBuffer
                                                                           withLength:lenMagBuffer
                                                                      usingWindowSize:PEAK_WINDOW_SIZE
-                                                             andPeakMagnitudeMinimum:PEAK_DBMAG_MIN
+                                                             andPeakMagnitudeMinimum:minimumMagnitude
                                                                       aboveFrequency:MIN_FREQUENCY_OF_WHISTLE_IN_HZ];
     
     // if there was at least one fundamental peak frequency
@@ -440,6 +445,24 @@
         
         // first pass flow rate detection (no fundamental following yet)
         float frequency = ((Peak*)[fundamentalFrequencies objectAtIndex:0]).frequency;
+        if(lastFrequency>0){
+            // grab the closest frequency to last detection
+            float minDistance = 100000.0;
+            float bestFrequency = -1;
+            NSRange range = NSMakeRange(0, MIN(fundamentalFrequencies.count,3));
+            float bestMag = ((Peak*)[fundamentalFrequencies firstObject]).magnitude;
+            for(Peak* f in [fundamentalFrequencies subarrayWithRange:range]){
+                float tmp = fabs(f.frequency-lastFrequency);
+                if(tmp<minDistance && f.magnitude/bestMag > 0.1){ // close and magnitude relative to max is large
+                    minDistance = tmp;
+                    bestFrequency = f.frequency;
+                }
+            }
+            if(bestFrequency>0)
+                frequency = bestFrequency;
+            
+        }
+        lastFrequency = frequency;
         
         // convert to flow rate from frequency using whistle model
         float flow = [self.whistle calcFlowInLiterPerSecondFromFrequencyInHz:frequency];
@@ -448,6 +471,7 @@
         [self.fvAnalyzer addFlowEstimateInLitersPerSecond:flow // calced flow rate
                                             withTimeStamp:block.timeCreated]; // original time stamp for audio
         
+        // this is not a great method, maybe do not even offer volume until we know start of effort for sure
         // query running volume from analyzer (using the new flow we just passed in)
         volume = [self.fvAnalyzer getEstimateOfTotalVolumeInLiters];
         
@@ -460,7 +484,7 @@
 
     }
     else{
-        //TODO: handle frequency dropout
+        //TODO: handle frequency dropout (probably not done here)
     }
     
 //    if(DEBUG)
@@ -532,7 +556,7 @@
 }
 
 
-//=============================================================================================================
+//====================================================================================================
 #pragma mark User Request Controls
 -(void)requestThatCurrentEffortShouldCancel{
     if(self.currentStage != SpirometryStageIsIdle){
@@ -574,7 +598,7 @@
 #pragma mark Debug Options
 -(void)activateDebugAudioModeWithWAVFile:(NSString*)filename{
     self.audioDebugIsActive = YES;
-    if(filename)
+    if(filename != nil)
         self.audioDebugFileName = filename;
     else
         self.audioDebugFileName = @"VortexWhistleRed";

@@ -23,6 +23,7 @@
 		B644C62A1B619C29002D3484 /* VortexWhistleRed.m4a in Resources */ = {isa = PBXBuildFile; fileRef = B644C6291B619C29002D3484 /* VortexWhistleRed.m4a */; };
 		B6A761641B20C97A00EB4121 /* SpirometryWhistle.m in Sources */ = {isa = PBXBuildFile; fileRef = B6A761631B20C97A00EB4121 /* SpirometryWhistle.m */; };
 		B6A761671B21107C00EB4121 /* FlowVolumeDataAnalyzer.m in Sources */ = {isa = PBXBuildFile; fileRef = B6A761661B21107C00EB4121 /* FlowVolumeDataAnalyzer.m */; };
+		B6C3FF511B751243000D1B93 /* CubicSpline.m in Sources */ = {isa = PBXBuildFile; fileRef = B6C3FF501B751243000D1B93 /* CubicSpline.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,6 +68,8 @@
 		B6A761631B20C97A00EB4121 /* SpirometryWhistle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpirometryWhistle.m; sourceTree = "<group>"; };
 		B6A761651B21107C00EB4121 /* FlowVolumeDataAnalyzer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlowVolumeDataAnalyzer.h; sourceTree = "<group>"; };
 		B6A761661B21107C00EB4121 /* FlowVolumeDataAnalyzer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FlowVolumeDataAnalyzer.m; sourceTree = "<group>"; };
+		B6C3FF4F1B751243000D1B93 /* CubicSpline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CubicSpline.h; sourceTree = "<group>"; };
+		B6C3FF501B751243000D1B93 /* CubicSpline.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CubicSpline.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -180,6 +183,8 @@
 				B63612511B1CC70E00289665 /* FFTHelper.m */,
 				B636125F1B1F556800289665 /* PeakFinder.h */,
 				B63612601B1F556800289665 /* PeakFinder.m */,
+				B6C3FF4F1B751243000D1B93 /* CubicSpline.h */,
+				B6C3FF501B751243000D1B93 /* CubicSpline.m */,
 				B63612591B1DFFB000289665 /* BufferedOverlapQueue.h */,
 				B636125A1B1DFFB000289665 /* BufferedOverlapQueue.m */,
 				B636125C1B1E26F500289665 /* DataBufferBlock.h */,
@@ -294,6 +299,7 @@
 				B63612611B1F556800289665 /* PeakFinder.m in Sources */,
 				B636125B1B1DFFB000289665 /* BufferedOverlapQueue.m in Sources */,
 				B63612551B1CEB3C00289665 /* SpirometerEffortAnalyzer.m in Sources */,
+				B6C3FF511B751243000D1B93 /* CubicSpline.m in Sources */,
 				B63612521B1CC70E00289665 /* FFTHelper.m in Sources */,
 				B63612281B1CC38500289665 /* SpiroAnalyzeViewController.m in Sources */,
 				B63612251B1CC38500289665 /* AppDelegate.m in Sources */,

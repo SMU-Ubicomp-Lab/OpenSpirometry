@@ -7,7 +7,9 @@
 //
 
 #import "FlowVolumeDataAnalyzer.h"
+#import "SpirometerConstants.h"
 #import <Accelerate/Accelerate.h>
+#import "CubicSpline.h"
 
 @interface FlowVolumeDataAnalyzer()
 
@@ -94,7 +96,7 @@
         [self.constantSampledFlowInLitersPerSecond addObject:@(flow)];
         [self.constantSampledVolumeInLiters addObject:@0]; // start with zero volume
     }
-    else if(self.constantSampledCumulativeTime.count>=1){ // then we must linearly interpolate from last entry
+    else if(self.constantSampledCumulativeTime.count==1){ // then we must linearly interpolate from last entry
         //TODO: it might be possible to back interpolate to zero flow here (using just the two values)
         //TODO: only run this on first two entries of flow and volume
         float timeX0 = [[self.constantSampledCumulativeTime lastObject] floatValue]; // already referenced to zero
@@ -121,9 +123,41 @@
         }
         
     }
-    else // add if statement
+    else if(self.dynamicSampledTime.count >= 3)
     {
-        // TODO: spline interpolations as num points is better for estimate
+        // do spline interpolations as num points is better for estimate
+        NSUInteger lastElement = self.dynamicSampledTime.count;
+        NSUInteger numSamplesToInterpolate = MIN(lastElement,5);
+        
+        // Use up to the last N elements for interpolation
+        NSRange range = NSMakeRange(lastElement-numSamplesToInterpolate, numSamplesToInterpolate);
+        NSMutableArray* timeX = [[self.dynamicSampledTime subarrayWithRange:range]mutableCopy];
+        NSMutableArray* flowX = [[self.dynamicSampledFlow subarrayWithRange:range]mutableCopy];
+        
+        // zero index
+        for(int i=0; i<timeX.count; i++){
+            timeX[i] = @([timeX[i] doubleValue] - initialTime);
+        }
+        
+        //create spline object
+        CubicSpline* csp = [[CubicSpline alloc]initWithPointsX:timeX andY:flowX];
+        float fillTime = [[self.constantSampledCumulativeTime lastObject] floatValue] + self.preferredSamplingInterval;
+        float newVolume = [[self.constantSampledVolumeInLiters lastObject] floatValue];
+        
+        while(fillTime <= [[timeX lastObject] floatValue]){
+            float newFlow = [csp interpolateX:fillTime]; // calc interpolated flow
+            // if the interpolation is off, just adde the last flow rate
+            if(newFlow <0)
+                newFlow = [[self.constantSampledFlowInLitersPerSecond lastObject] floatValue];
+            newVolume += newFlow*self.preferredSamplingInterval; // add in volume (probably a really noisy estimate here, will smooth later)
+            
+            //add flow and new time
+            [self.constantSampledFlowInLitersPerSecond addObject:@(newFlow)];
+            [self.constantSampledVolumeInLiters addObject:@(newVolume)];
+            [self.constantSampledCumulativeTime addObject:@(fillTime)];
+            
+            fillTime += self.preferredSamplingInterval;
+        }
         
     }
 }
@@ -149,16 +183,17 @@
     // TODO: check output and be sure this returns properly encapsulated, THIS IS NOT RETURNED YET
     // perform filtering of the flow rate
     NSMutableArray *filteredFlow = [self filterArray:self.constantSampledFlowInLitersPerSecond
-                                       withFIRFilter:@[@0.00612500495896, @0.133331686187, @0.100128804544, @0.127394330804, @0.143746190497, @0.149443061676, @0.143746190497, @0.127394330804, @0.100128804544, @0.133331686187, @0.00612500495896]]; // lowpass filter created in python
+                                       withFIRFilter:@[@(-0.0570114635), @(0.0477192582), @(0.0345309828), @(0.0268428757), @(0.0225935565), @(0.0203979552), @(0.0194419320), @(0.0192504413), @(0.0196427420), @(0.0203327997), @(0.0210234412), @(0.0219978553), @(0.0228894845), @(0.0237515661), @(0.0246741134), @(0.0254770231), @(0.0263172908), @(0.0270086622), @(0.0277167684), @(0.0282894016), @(0.0287857463), @(0.0291875253), @(0.0295200754), @(0.0297003562), @(0.0298753302), @(0.0298742843), @(0.0298753302), @(0.0297003562), @(0.0295200754), @(0.0291875253), @(0.0287857463), @(0.0282894016), @(0.0277167684), @(0.0270086622), @(0.0263172908), @(0.0254770231), @(0.0246741134), @(0.0237515661), @(0.0228894845), @(0.0219978553), @(0.0210234412), @(0.0203327997), @(0.0196427420), @(0.0192504413), @(0.0194419320), @(0.0203979552), @(0.0225935565), @(0.0268428757), @(0.0345309828), @(0.0477192582), @(-0.0570114635), ]]; // lowpass filter created in python
+    
 // GENERATED VIA:----------------------------------------
 //    from scipy.signal import fir_filter_design as fir
 //    from scipy.signal import freqz
-//    fir_taps = fir.remez(numtaps=11, bands=[0, 0.05, 0.1, 0.5],desired=[1,0])
-//    w, h = freqz(fir_taps)
+//    fir_taps = fir.remez( SEE DOCUMENTATION FOR FILTER CREATION )
 //-------------------------------------------------------
     
     
     //TODO: perform sharpness enhancement at the beginning of the test or try to use raw values to avoid biasing beginning of the test with filtering (important when use curve back propagation later on for detecting insufficient starts)
+    filteredFlow = [self backExtrapolateFlowBeginningFromFlowArray:filteredFlow];
     
     //TODO: adjust time series samples to begin at zero with the start of the test
     //TODO: add in effort error checking (after the test)
@@ -167,8 +202,14 @@
     // Failures:{didCough, insufficient, early stop, bad start}
     // data: flowVolume, flowTime, volumeTime, common scalar measures
     
+    //TODO: add metadata to dictionary for error checking during the analysis analysis
+    
+    //    if(DEBUG){
+    //        NSLog(@"DynamicTime: %@\n\n Dynamic FLOW: %@",self.dynamicSampledTime, self.dynamicSampledFlow);
+    //    }
+    
     // all blank for now, just so you get an idea of the structure of what is returned
-    return @{@"FlowCurveInLitersPerSecond":[[NSArray alloc] initWithArray:self.constantSampledFlowInLitersPerSecond], // send back nonmutable copy
+    return @{@"FlowCurveInLitersPerSecond":[[NSArray alloc] initWithArray:filteredFlow], // send back nonmutable copy
              @"VolumeCurveInLiters":[[NSArray alloc] initWithArray:self.constantSampledVolumeInLiters], // send back nonmutable copy
              @"TimeStampsForFlowAndVolume":[[NSArray alloc] initWithArray:self.constantSampledCumulativeTime], // send back nonmutable copy
              @"PeakFlowInLitersPerSecond":self.peakFlowInLitersPerSecond,
@@ -262,6 +303,71 @@
 //    
 //    return outputEncapsulated;
 //}
+
+-(NSMutableArray*)backExtrapolateFlowBeginningFromFlowArray:(NSMutableArray*)flow{
+    
+    
+    // need more checks here to backinterpolate
+    float *flowAsFloat = (float*)calloc(flow.count,sizeof(float));
+    for(int i=0;i<flow.count;i++){
+        flowAsFloat[i] = [[flow objectAtIndex:i] floatValue];
+    }
+    
+    // find peak flow and position
+    float maxValue;
+    vDSP_Length maxPosition;
+    vDSP_maxvi(flowAsFloat, 1, &maxValue, &maxPosition, flow.count);
+    
+    // start at peak flow and find where we are not monotonic
+    vDSP_Length idxStartValidFlow = maxPosition - NUM_SAMPLES_BACK_FROM_PEAKFLOW_TO_INTERPOLATE;
+    while(idxStartValidFlow > 5){
+        if(flowAsFloat[idxStartValidFlow-1]<flowAsFloat[idxStartValidFlow])
+            idxStartValidFlow--;
+        else
+            break;
+    }
+    
+    // create range from the data and back interpolate
+    NSRange range = NSMakeRange(idxStartValidFlow, maxPosition-idxStartValidFlow);
+    NSMutableArray* timeX = [[self.constantSampledCumulativeTime subarrayWithRange:range]mutableCopy];
+    NSMutableArray* flowX = [[flow subarrayWithRange:range]mutableCopy];
+    CubicSpline* csp = [[CubicSpline alloc]
+                        initWithPointsX:timeX
+                                   andY:flowX];
+    
+    // now get the interpolated values if they are greater than zero (else just get them out of here!!!)
+    int firstNonZeroElement = -1;
+    for(int i=0;i<idxStartValidFlow;i++){
+        float tmp = [csp interpolateX:[self.constantSampledCumulativeTime[i] floatValue]];
+        if(tmp>=0 && tmp<flowAsFloat[i]){
+            flowAsFloat[i] = tmp;
+            if(firstNonZeroElement<0)
+                firstNonZeroElement = i;
+        }
+        else if(tmp<0)
+            flowAsFloat[i] = 0.0;
+    }
+    
+    //    for(int i=(int)idxStartValidFlow;i<maxPosition;i++){
+    //        float tmp = [csp interpolateX:[self.constantSampledCumulativeTime[i] floatValue]];
+    //        if(tmp>=0)
+    //            flowAsFloat[i] = (tmp+flowAsFloat[i])/2;
+    //    }
+    if(firstNonZeroElement>0){
+        for(int i=0;i<self.constantSampledCumulativeTime.count;i++){
+            self.constantSampledCumulativeTime[i] = @(self.preferredSamplingInterval*(i-firstNonZeroElement+1));
+        }
+    }
+    
+    // now re-encapsulate it and move on
+    for(int i=0;i<flow.count;i++){
+        flow[i] = @(flowAsFloat[i]);
+    }
+    
+    free(flowAsFloat);
+    
+    return flow;
+}
 
 
 @end
