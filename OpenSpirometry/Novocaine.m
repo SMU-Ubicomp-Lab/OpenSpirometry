@@ -53,6 +53,7 @@
 
 @property (nonatomic) AudioBufferList convertedFileData;
 @property (nonatomic) ExtAudioFileRef audioFileRef;
+@property (nonatomic) ExtAudioFileRef audioFileRefOutput;
 @property (nonatomic) UInt32 audioFileFrameCount;
 @property (nonatomic) BOOL shouldUseAudioFromFile;
 @property (nonatomic, strong) NSString *audioFileName;
@@ -111,6 +112,7 @@
         _playing = NO;
         _shouldUseAudioFromFile = NO;
         _audioFileTimer = nil;
+        _shouldSaveContinuouslySampledMicrophoneAudioDataToNewFile = NO;
 		
 		return self;
 		
@@ -133,6 +135,20 @@
     free(_outData);
     
     
+}
+
+
+//setter for audio file
+-(void)setShouldSaveContinuouslySampledMicrophoneAudioDataToNewFile:(BOOL)shouldSaveContinuouslySampledMicrophoneAudioDataToNewFile {
+    if(!self.playing) // don't allow changes midstream, as this could cause a buidlup of unclosed files on the disk
+    {
+        if(_shouldUseAudioFromFile==NO )
+            _shouldSaveContinuouslySampledMicrophoneAudioDataToNewFile = shouldSaveContinuouslySampledMicrophoneAudioDataToNewFile;
+        else
+            _shouldSaveContinuouslySampledMicrophoneAudioDataToNewFile = NO; // don't allow saving if the audio file is there
+    }
+    
+    // next time the play button is set, we will create an audio file if this was set to true
 }
 
 
@@ -471,10 +487,13 @@
 
 
 - (void)pause {
-	
+    
 	if (self.playing) {
         if(self.audioFileTimer)
             [self.audioFileTimer invalidate];
+        
+        if(self.shouldSaveContinuouslySampledMicrophoneAudioDataToNewFile)
+            [self closeAudioFileForWritingFromMicrophone];
         
         CheckError( AudioOutputUnitStop(_inputUnit), "Couldn't stop the output unit");
 		self.playing = NO;
@@ -483,6 +502,8 @@
 }
 
 - (void)play {
+    
+    
     
     if(self.shouldUseAudioFromFile){ //Play from file
         CheckError( AudioOutputUnitStop(_inputUnit), "Couldn't stop the output unit");
@@ -509,6 +530,11 @@
         if ( self.inputAvailable ) {
             // Set the audio session category for simultaneous play and record
             if (!self.playing) {
+                
+                // if saving microphone data to audio file, setup the file
+                if(self.shouldSaveContinuouslySampledMicrophoneAudioDataToNewFile)
+                   [self setupAudioFileForWritingFromMicrophone];
+                
                 CheckError( AudioOutputUnitStart(self.inputUnit), "Couldn't start the output unit");
                 self.playing = YES;
                 
@@ -586,6 +612,13 @@ OSStatus inputCallback   (void						*inRefCon,
     
     // Now do the processing! 
     sm.inputBlock(sm.inData, inNumberFrames, sm.numInputChannels);
+    
+    // save audio data to file if we are told to do so
+    if(sm.shouldSaveContinuouslySampledMicrophoneAudioDataToNewFile){
+        ExtAudioFileWrite(sm.audioFileRefOutput,
+                          inNumberFrames,
+                          ioData);
+    }
     
     return noErr;
 	
@@ -828,9 +861,9 @@ void CheckError(OSStatus error, const char *operation)
     NSString * source = [[NSBundle mainBundle] pathForResource:name ofType:@"m4a"]; // SPECIFY YOUR FILE FORMAT
     
     if(source==nil){
-        [NSException raise:@"BadFileAccess"
-                    format:[NSString stringWithFormat:@"File provided does not exist, %@",name]
-                 arguments:nil];
+        //TODO: issue an NSError here for caller to deal with properly
+        NSLog(@"BadFileAccess:File provided does not exist, %@",name);
+        return -1.0;
     }
     
     const char *cString = [source cStringUsingEncoding:NSASCIIStringEncoding];
@@ -895,7 +928,7 @@ void CheckError(OSStatus error, const char *operation)
     float *samplesAsCArray;
     UInt32 numChannels = _convertedFileData.mBuffers[0].mNumberChannels;
     
-    // read from the lasy place we were in the file
+    // read from the last place we were in the file
     ExtAudioFileRead(
                      _audioFileRef,
                      &_audioFileFrameCount,
@@ -914,13 +947,82 @@ void CheckError(OSStatus error, const char *operation)
     }
     else{
         [timer invalidate];
-        //TODO: end the test
+        //stop reading and close the file
+        ExtAudioFileDispose(_audioFileRef);
     }
 }
 
 -(void) overrideMicrophoneWithAudioFile:(NSString*)audioFileName{
     self.shouldUseAudioFromFile = YES;
     self.audioFileName = audioFileName;
+    self.shouldSaveContinuouslySampledMicrophoneAudioDataToNewFile = NO; // do not allow in debug
+}
+
+-(void)setDebugModeOffAndUseMicrophone{
+    //TODO: this method is not tested
+    self.shouldUseAudioFromFile = NO;
+    self.audioFileName = nil;
+    
+    if (self.playing) {
+        [self pause]; // invalidates timers etc. associated with file
+        [self play]; // start it up again with newly created audio object for microphone
+    }
+}
+
+
+#pragma mark Save Audio Data From Microphone
+-(void)setupAudioFileForWritingFromMicrophone{
+    // this places the audio into the documents directory
+    
+    
+    // manipualted from http://stackoverflow.com/questions/6821517/save-an-image-to-application-documents-folder-from-uiview-on-ios
+    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsPath = [paths objectAtIndex:0]; //Get the docs directory
+    NSString *timeString = [NSString stringWithFormat:@"%f.m4a",[[NSDate date] timeIntervalSince1970] * 1000];
+    NSString *source = [documentsPath stringByAppendingPathComponent:timeString]; //Add the file name
+    
+    const char *cString = [source cStringUsingEncoding:NSASCIIStringEncoding];
+    
+    CFStringRef str = CFStringCreateWithCString(
+                                                NULL,
+                                                cString,
+                                                kCFStringEncodingMacRoman
+                                                );
+    
+    CFURLRef outputFileURL = CFURLCreateWithFileSystemPath(
+                                                          kCFAllocatorDefault,
+                                                          str,
+                                                          kCFURLPOSIXPathStyle,
+                                                          false
+                                                          );
+    
+    AudioStreamBasicDescription audioFormat;
+    audioFormat.mSampleRate = 44100;
+    audioFormat.mFormatID = kAudioFormatLinearPCM;
+    audioFormat.mFormatFlags = kLinearPCMFormatFlagIsFloat;
+    audioFormat.mBitsPerChannel = sizeof(Float32) * 8;
+    audioFormat.mChannelsPerFrame = 1; // Mono
+    audioFormat.mBytesPerFrame = audioFormat.mChannelsPerFrame * sizeof(Float32);  // == sizeof(Float32)
+    audioFormat.mFramesPerPacket = 1;
+    audioFormat.mBytesPerPacket = audioFormat.mFramesPerPacket * audioFormat.mBytesPerFrame; // = sizeof(Float32)
+    
+    ExtAudioFileCreateWithURL(outputFileURL,
+                              kAudioFileM4AType,
+                              &audioFormat, // how to save the file
+                              NULL, // this is embedded in the audio format
+                              kAudioFileFlags_EraseFile, // hopefully no file created in the same millisecond as this one
+                              &_audioFileRefOutput); // output we use to save into this reference
+    
+    // okay so it is ready to be written to!!
+    
+    // avoid any CF memory leaks
+    CFRelease(str);
+    CFRelease(outputFileURL);
+}
+
+-(void)closeAudioFileForWritingFromMicrophone{
+    ExtAudioFileDispose(_audioFileRefOutput);
 }
 
 @end

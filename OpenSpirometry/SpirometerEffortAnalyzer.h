@@ -38,6 +38,7 @@
 -(void)requestThatCurrentEffortShouldCancel;
 -(void)requestThatEffortShouldEnd;
 -(void)activateDebugAudioModeWithWAVFile:(NSString*)filenameAndPath;
+-(void)shouldSaveSeparateEffortsToDocumentDirectory:(BOOL)should;
 
 //-(void)requestEndEffortInSeconds:(int)seconds;
 

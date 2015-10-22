@@ -609,6 +609,11 @@
     }
 }
 
+-(void)shouldSaveSeparateEffortsToDocumentDirectory:(BOOL)should{
+     if(_audioManager){
+         self.audioManager.shouldSaveContinuouslySampledMicrophoneAudioDataToNewFile = should;
+     }
+}
 
 
 @end

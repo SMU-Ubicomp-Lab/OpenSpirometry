@@ -90,6 +90,7 @@ typedef void (^InputBlock)(float *data, UInt32 numFrames, UInt32 numChannels);
 @property BOOL playing;
 @property float *inData;
 @property float *outData;
+@property (nonatomic) BOOL shouldSaveContinuouslySampledMicrophoneAudioDataToNewFile; //
 
 
 // Singleton methods
@@ -106,7 +107,8 @@ typedef void (^InputBlock)(float *data, UInt32 numFrames, UInt32 numChannels);
 - (void)checkSessionProperties;
 - (void)checkAudioSource;
 
--(void) overrideMicrophoneWithAudioFile:(NSString*)audioFileName;
+-(void)overrideMicrophoneWithAudioFile:(NSString*)audioFileName;
+-(void)setDebugModeOffAndUseMicrophone;
 
 + (enum AVAudioSessionRecordPermission)checkAudioAuthorization;
 
