@@ -45,6 +45,7 @@
 #import <Accelerate/Accelerate.h>
 #import <AVFoundation/AVAudioSession.h>
 #import <AVFoundation/AVCaptureDevice.h>
+#import <pthread.h>
 
 
 //static Novocaine *audioManager = nil;
@@ -58,6 +59,7 @@
 @property (nonatomic) BOOL shouldUseAudioFromFile;
 @property (nonatomic, strong) NSString *audioFileName;
 @property (nonatomic, strong) NSTimer *audioFileTimer;
+@property (nonatomic) float *outputBuffer;
 
 - (void)setupAudio;
 
@@ -68,6 +70,7 @@
 
 @implementation Novocaine
 
+static pthread_mutex_t outputAudioFileLock;
 
 #pragma mark - Singleton Methods
 + (Novocaine *) audioManager
@@ -109,6 +112,9 @@
 		_inData  = (float *)calloc(8192, sizeof(float)); // probably more than we'll need
         _outData = (float *)calloc(8192, sizeof(float));
         
+        _outputBuffer = (float *)calloc(2*44100.0, sizeof(float));
+        pthread_mutex_init(&outputAudioFileLock, NULL);
+        
         _playing = NO;
         _shouldUseAudioFromFile = NO;
         _audioFileTimer = nil;
@@ -133,6 +139,7 @@
     
     free(_inData);
     free(_outData);
+    free(_outputBuffer);
     
     
 }
@@ -615,9 +622,25 @@ OSStatus inputCallback   (void						*inRefCon,
     
     // save audio data to file if we are told to do so
     if(sm.shouldSaveContinuouslySampledMicrophoneAudioDataToNewFile){
-        ExtAudioFileWrite(sm.audioFileRefOutput,
-                          inNumberFrames,
-                          ioData);
+        //ExtAudioFileWrite(sm.audioFileRefOutput,inNumberFrames,sm.inputBuffer);
+        //ExtAudioFileWriteAsync(sm.audioFileRefOutput,inNumberFrames,sm.inputBuffer);
+        UInt32 numIncomingBytes = inNumberFrames*sm.numInputChannels*sizeof(float);
+        memcpy(sm.outputBuffer, sm.inData, numIncomingBytes);
+        
+        AudioBufferList outgoingAudio;
+        outgoingAudio.mNumberBuffers = 1;
+        outgoingAudio.mBuffers[0].mNumberChannels = inNumberFrames;
+        outgoingAudio.mBuffers[0].mDataByteSize = numIncomingBytes;
+        outgoingAudio.mBuffers[0].mData = sm.outputBuffer;
+        
+        if( 0 == pthread_mutex_trylock( &outputAudioFileLock ) )
+        {
+            ExtAudioFileWriteAsync(sm.audioFileRefOutput, inNumberFrames, &outgoingAudio);
+        }
+        pthread_mutex_unlock( &outputAudioFileLock );
+        
+        //SInt64 frameOffset = 0;
+        //ExtAudioFileTell(sm.audioFileRefOutput, &frameOffset);
     }
     
     return noErr;
@@ -630,7 +653,7 @@ OSStatus renderCallback (void						*inRefCon,
                          const AudioTimeStamp 		* inTimeStamp,
                          UInt32						inOutputBusNumber,
                          UInt32						inNumberFrames,
-                         AudioBufferList				* ioData)
+                         AudioBufferList			* ioData)
 {
     
     
@@ -979,7 +1002,7 @@ void CheckError(OSStatus error, const char *operation)
     
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsPath = [paths objectAtIndex:0]; //Get the docs directory
-    NSString *timeString = [NSString stringWithFormat:@"%f.m4a",[[NSDate date] timeIntervalSince1970] * 1000];
+    NSString *timeString = [NSString stringWithFormat:@"%f.m4a",[[NSDate date] timeIntervalSince1970]]; // get UTC time string
     NSString *source = [documentsPath stringByAppendingPathComponent:timeString]; //Add the file name
     
     const char *cString = [source cStringUsingEncoding:NSASCIIStringEncoding];
@@ -997,22 +1020,34 @@ void CheckError(OSStatus error, const char *operation)
                                                           false
                                                           );
     
-    AudioStreamBasicDescription audioFormat;
-    audioFormat.mSampleRate = 44100;
-    audioFormat.mFormatID = kAudioFormatLinearPCM;
-    audioFormat.mFormatFlags = kLinearPCMFormatFlagIsFloat;
-    audioFormat.mBitsPerChannel = sizeof(Float32) * 8;
-    audioFormat.mChannelsPerFrame = 1; // Mono
-    audioFormat.mBytesPerFrame = audioFormat.mChannelsPerFrame * sizeof(Float32);  // == sizeof(Float32)
-    audioFormat.mFramesPerPacket = 1;
-    audioFormat.mBytesPerPacket = audioFormat.mFramesPerPacket * audioFormat.mBytesPerFrame; // = sizeof(Float32)
+    // Create a file for writing to
     
-    ExtAudioFileCreateWithURL(outputFileURL,
-                              kAudioFileM4AType,
-                              &audioFormat, // how to save the file
-                              NULL, // this is embedded in the audio format
-                              kAudioFileFlags_EraseFile, // hopefully no file created in the same millisecond as this one
-                              &_audioFileRefOutput); // output we use to save into this reference
+    AudioStreamBasicDescription audioFormat;
+    
+    AudioStreamBasicDescription outputFileDesc = {44100.0,  kAudioFormatMPEG4AAC, 0, 0, 1024, 0, self.numInputChannels, 0, 0};
+    
+    CheckError(ExtAudioFileCreateWithURL(outputFileURL, kAudioFileM4AType, &outputFileDesc, NULL, kAudioFileFlags_EraseFile, &_audioFileRefOutput), "Creating file");
+    
+    audioFormat.mSampleRate = self.samplingRate;
+    audioFormat.mFormatID = kAudioFormatLinearPCM;
+    audioFormat.mFormatFlags = kAudioFormatFlagIsFloat;
+    audioFormat.mBytesPerPacket = 4*self.numInputChannels;
+    audioFormat.mFramesPerPacket = 1;
+    audioFormat.mBytesPerFrame = 4*self.numInputChannels;
+    audioFormat.mChannelsPerFrame = self.numInputChannels;
+    audioFormat.mBitsPerChannel = 32;
+    
+    // Apply the format to our file
+    OSStatus tmp = ExtAudioFileSetProperty(_audioFileRefOutput, kExtAudioFileProperty_ClientDataFormat, sizeof(AudioStreamBasicDescription), &audioFormat);
+    CheckError(tmp,"Could not open file for writing");
+    
+    
+    if( 0 == pthread_mutex_trylock( &outputAudioFileLock ) )
+    {
+        tmp = ExtAudioFileWriteAsync(_audioFileRefOutput,0,NULL);
+        CheckError(tmp,"Could not initialize asynchronous writing");
+    }
+    pthread_mutex_unlock( &outputAudioFileLock );
     
     // okay so it is ready to be written to!!
     
@@ -1022,7 +1057,10 @@ void CheckError(OSStatus error, const char *operation)
 }
 
 -(void)closeAudioFileForWritingFromMicrophone{
-    ExtAudioFileDispose(_audioFileRefOutput);
+    pthread_mutex_lock( &outputAudioFileLock );
+    OSStatus tmp = ExtAudioFileDispose(_audioFileRefOutput);
+    CheckError(tmp,"File Could not be closed");
+    pthread_mutex_unlock( &outputAudioFileLock );
 }
 
 @end

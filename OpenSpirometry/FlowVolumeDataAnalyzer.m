@@ -318,8 +318,12 @@
     vDSP_Length maxPosition;
     vDSP_maxvi(flowAsFloat, 1, &maxValue, &maxPosition, flow.count);
     
+    vDSP_Length idxStartValidFlow = 5;
     // start at peak flow and find where we are not monotonic
-    vDSP_Length idxStartValidFlow = maxPosition - NUM_SAMPLES_BACK_FROM_PEAKFLOW_TO_INTERPOLATE;
+    if(maxPosition>NUM_SAMPLES_BACK_FROM_PEAKFLOW_TO_INTERPOLATE)
+        idxStartValidFlow = maxPosition - NUM_SAMPLES_BACK_FROM_PEAKFLOW_TO_INTERPOLATE;
+        
+    
     while(idxStartValidFlow > 5){
         if(flowAsFloat[idxStartValidFlow-1]<flowAsFloat[idxStartValidFlow])
             idxStartValidFlow--;

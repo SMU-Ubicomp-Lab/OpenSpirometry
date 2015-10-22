@@ -40,6 +40,7 @@
 @property (nonatomic) BOOL silenceThresholdIsSet;
 
 @property (nonatomic) BOOL audioDebugIsActive;
+@property (nonatomic) BOOL shouldSaveEffortsToDocumentDirectory;
 @property (nonatomic, strong) NSString *audioDebugFileName;
 
 @end
@@ -82,6 +83,8 @@
         if(_audioDebugIsActive){
             [_audioManager overrideMicrophoneWithAudioFile:_audioDebugFileName];
         }
+        
+        _audioManager.shouldSaveContinuouslySampledMicrophoneAudioDataToNewFile = _shouldSaveEffortsToDocumentDirectory;
 
         // and the other properties dependent here
         _frequencyResolution = ((float)BUFFER_SIZE)/_audioManager.samplingRate;
@@ -154,6 +157,7 @@
     _prefferredAudioMaxUpdateIntervalInSeconds = 1.0/30.0; // 30FPS default
     _audioDebugIsActive = NO;
     _audioDebugFileName = nil;
+    _shouldSaveEffortsToDocumentDirectory = NO;
     
     _whistle = [[SpirometryWhistle alloc]init]; // whistle is set to default params (Sato Whistle)
     
@@ -362,6 +366,12 @@
     if(testStarted){
         
         CFTimeInterval elapsedTime = CACurrentMediaTime()-lastGoodTime;
+        
+        CFTimeInterval totalEffortTime =CACurrentMediaTime()-silencedEndedStartTime;
+        
+        if(totalEffortTime>TEST_MAX_DURATION_SECONDS)
+            return SpirometryStageIsFinished;
+        
         if(maxValue>TEST_END_THRESH*self.silenceThreshold){
             // audio still way above threshold
             lastGoodTime = CACurrentMediaTime();
@@ -610,9 +620,10 @@
 }
 
 -(void)shouldSaveSeparateEffortsToDocumentDirectory:(BOOL)should{
-     if(_audioManager){
-         self.audioManager.shouldSaveContinuouslySampledMicrophoneAudioDataToNewFile = should;
-     }
+    self.shouldSaveEffortsToDocumentDirectory = should;
+    if(_audioManager){
+        self.audioManager.shouldSaveContinuouslySampledMicrophoneAudioDataToNewFile = should;
+    }
 }
 
 

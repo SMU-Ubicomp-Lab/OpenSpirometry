@@ -35,8 +35,14 @@
     // the FPS possible on this depends on the audio buffer size and sampling rate, which is different for different phones
     // most likely this has a maximum update rate of about 100 FPS
     
-    // **for debugging**: this turns on the debug mode for reading the effort from a file (only wav currently supported)
-    [self.spiro activateDebugAudioModeWithWAVFile:@"VortexWhistleRed"]; // default audio file name
+    // **for debugging**: this turns on the debug mode for reading the effort from a file (only m4a currently supported)
+    //[self.spiro activateDebugAudioModeWithWAVFile:@"VortexWhistleRed"]; // default audio file name
+    
+    // if using the microphone, this will save each spirometry effort audio to the documents directory (
+    [self.spiro shouldSaveSeparateEffortsToDocumentDirectory:YES];
+    // each audio file is saved using the UTC timestamp down to the milliseconds
+    // each time you perform an effort, a new audio file is saved. The format of the file is m4a (lossy, but not by much)
+    // to get the document from the phone using iTunes, be sure that UIFileSharing is set to true in the info.plist for the app
     
 }
 

@@ -26,7 +26,7 @@
 #define WAIT_DURATION_AFTER_TEST 3          // in seconds, time after large audio to end the test
 #define MIN_FREQUENCY_OF_WHISTLE_IN_HZ 60   // smallest detectable frquency we want
 #define NUM_SAMPLES_BACK_FROM_PEAKFLOW_TO_INTERPOLATE 30 // number of samples to start the search for breaking monotnic values from the whistle
-
+#define TEST_MAX_DURATION_SECONDS 10
 
 
 //define stages for our test
