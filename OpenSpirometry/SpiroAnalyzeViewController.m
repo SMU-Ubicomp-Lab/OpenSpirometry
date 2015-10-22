@@ -30,6 +30,7 @@
     
     self.spiro = [[SpirometerEffortAnalyzer alloc] init];
     self.spiro.delegate = self;
+    
     self.spiro.prefferredAudioMaxUpdateIntervalInSeconds = 1.0/24.0; // the default is 30FPS, so setting lower
     // the FPS possible on this depends on the audio buffer size and sampling rate, which is different for different phones
     // most likely this has a maximum update rate of about 100 FPS
@@ -84,6 +85,7 @@
 
 -(void)didEndEffortWithResults:(NSDictionary*)results{
     // right now results are an empty dictionary
+    
     // in the future the results of the effort will all be stored as key/value pairs
     for(int i=0;i<((NSArray*)results[@"FlowCurveInLitersPerSecond"]).count;i++){
         printf("%.4f\t%.4f\n",[results[@"TimeStampsForFlowAndVolume"][i] floatValue],[results[@"FlowCurveInLitersPerSecond"][i] floatValue]);
